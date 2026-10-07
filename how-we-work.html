@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How We Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+/* Colour grammar (colour-blind safe, Okabe-Ito based):
+   active/after = sky blue, drift/problem = vermillion + dashed line or icon, warning = yellow, person = pink, everything else slate. */
+:root {
+  --bg: #0b1120;
+  --card: #141e33;
+  --card-2: #1a2540;
+  --border: #2a3754;
+  --fg: #f1f5f9;
+  --fg-2: #cbd5e1;
+  --muted: #94a3b8;
+  --slate: #64748b;
+  --before: #e8743b;
+  --before-soft: rgba(232,116,59,.14);
+  --after: #5ab4e8;
+  --after-soft: rgba(90,180,232,.14);
+  --warn: #e3cf5a;
+  --warn-soft: rgba(227,207,90,.14);
+  --prod: #cc79a7;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #060a14; overflow: hidden; }
+body { color: var(--fg); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+
+#viewport { position: fixed; inset: 0; }
+#stage {
+  width: 1600px; height: 900px; position: absolute; left: 50%; top: 50%; overflow: hidden;
+  background: radial-gradient(1200px 700px at 85% -10%, #142039 0%, var(--bg) 55%);
+  transform-origin: center center;
+}
+#map { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; }
+#scrim { position: absolute; top: 0; bottom: 0; right: 0; left: 1600px; z-index: 2; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(11,17,32,0) 0, rgba(11,17,32,.95) 110px); }
+.slide { position: absolute; inset: 0; padding: 64px 96px 92px; display: none; z-index: 3; }
+.slide.active { display: block; }
+.p { position: absolute; }
+.ov { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+
+.kicker { font-family: var(--font-mono); font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+h1 { font-size: 92px; line-height: 1.02; font-weight: 700; letter-spacing: -.02em; }
+h2 { font-size: 54px; line-height: 1.08; font-weight: 700; letter-spacing: -.015em; }
+h3 { font-size: 26px; font-weight: 600; }
+.lead { font-size: 28px; line-height: 1.4; color: var(--fg-2); }
+.cap { font-size: 20px; line-height: 1.45; color: var(--muted); }
+.small { font-size: 16px; line-height: 1.45; color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.after { color: var(--after); } .warn { color: var(--warn); } .before { color: var(--before); } .prod { color: var(--prod); } .muted { color: var(--muted); }
+code { font-family: var(--font-mono); font-size: .88em; background: #0b1426; border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 17px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--fg-2); white-space: nowrap; }
+.tag.after { border-color: var(--after); color: var(--after); background: var(--after-soft); }
+.tag.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
+.hatch { background: repeating-linear-gradient(135deg, var(--before-soft) 0 6px, transparent 6px 12px); }
+.tag.before { border-color: var(--before); color: var(--before); background: var(--before-soft); border-style: dashed; }
+.box { position: absolute; border: 1px solid var(--border); background: var(--card); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 20px; color: var(--fg-2); white-space: nowrap; }
+.box.on { border-color: var(--after); color: var(--fg); }
+.box.bad { border: 2px dashed var(--before); color: var(--fg); }
+.box.base { background: #0e1729; color: var(--muted); }
+.num { font-family: var(--font-mono); font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+ul.l { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+ul.l li { font-size: 18px; line-height: 1.35; color: var(--fg-2); padding-left: 20px; position: relative; }
+ul.l li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 7px; height: 7px; border-radius: 2px; background: var(--slate); }
+/* Code frame: the same pre style and colours as the "SDK in use" slide in the introduction deck. */
+pre.code { font-family: var(--font-mono); font-size: 15px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin: 0; color: var(--fg); background: #0b1426; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+pre.code .k { color: #94a3b8; } pre.code .s { color: #e3cf5a; } pre.code .c { color: #64748b; } pre.code .f { color: var(--after); }
+.ico { width: 40px; height: 40px; flex: none; border-radius: 10px; border: 1px solid var(--border); background: #0e182c; display: grid; place-items: center; }
+.ico svg { width: 24px; height: 24px; fill: none; stroke: #cbd5e1; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+#chrome { position: absolute; left: 96px; right: 96px; bottom: 30px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 16px; color: #56637a; z-index: 20; pointer-events: none; }
+#progress { position: absolute; left: 0; top: 0; height: 4px; background: var(--after); width: 0; z-index: 30; transition: width .35s ease; }
+#notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow: auto; background: rgba(6,10,20,.96); border-top: 1px solid var(--border); padding: 18px 28px 22px; font-size: 18px; line-height: 1.55; color: var(--fg-2); display: none; z-index: 50; }
+#notes.on { display: block; }
+#notes .h { font-family: var(--font-mono); font-size: 13px; letter-spacing: .14em; color: var(--muted); margin-bottom: 6px; }
+#help { position: fixed; top: 14px; right: 18px; font-family: var(--font-mono); font-size: 12px; color: #4b5870; z-index: 60; }
+.slide aside.notes { display: none; }
+
+/* Slide-specific */
+.lrow { display: grid; grid-template-columns: 140px 1fr 110px; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid #1d2943; }
+.ltag { font-family: var(--font-mono); font-weight: 700; letter-spacing: .1em; font-size: 18px; color: var(--fg); }
+.ltxt { font-size: 22px; color: var(--fg-2); }
+.pips { display: flex; gap: 6px; }
+.pips i { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #3a4867; }
+.pips i.f { background: #cbd5e1; border-color: #cbd5e1; }
+.rule { display: flex; gap: 18px; align-items: flex-start; }
+.rule .t { font-size: 24px; color: var(--fg); line-height: 1.3; }
+.rule .s { font-size: 18px; color: var(--muted); margin-top: 2px; }
+.doc { position: absolute; width: 240px; height: 112px; background: var(--card-2); border: 1px solid #3a4867; border-radius: 12px; padding: 16px 18px; display: flex; gap: 14px; }
+.doc .t { font-size: 21px; font-weight: 600; line-height: 1.2; }
+.doc .s { font-size: 15px; color: var(--muted); margin-top: 6px; }
+.eq { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--after); color: var(--after); display: grid; place-items: center; font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+.eq.bad { border: 2px dashed var(--before); color: var(--before); }
+.lnk { position: absolute; background: var(--after); }
+.step { display: grid; grid-template-columns: 36px 1fr 104px; gap: 14px; align-items: center; }
+.step .n { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #3a4867; display: grid; place-items: center; font-family: var(--font-mono); font-size: 16px; color: var(--fg-2); }
+.step .t { font-size: 20px; line-height: 1.3; color: var(--fg-2); }
+.step .tag { font-size: 14px; justify-self: start; }
+.note { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; }
+.note .q { font-size: 23px; line-height: 1.3; color: var(--fg); }
+.note .r { font-size: 18px; line-height: 1.4; color: var(--fg-2); margin-top: 10px; padding-left: 14px; border-left: 3px solid var(--after); }
+.chipi { display: inline-block; font-size: 19px; padding: 6px 14px; border-radius: 10px; border: 1px solid var(--after); color: var(--fg); background: var(--after-soft); margin: 0 8px 8px 0; }
+.load { display: flex; gap: 16px; align-items: flex-start; }
+.load .n { font-family: var(--font-mono); color: var(--after); font-size: 18px; width: 22px; padding-top: 3px; }
+.load .t { font-size: 22px; color: var(--fg); }
+.load .t span { color: var(--muted); font-size: 18px; }
+.case { display: grid; grid-template-columns: 330px 36px 360px 36px 1fr; align-items: stretch; }
+.case > div.c { min-height: 64px; font-size: 19px !important; }
+.case > div.c { border-radius: 12px; padding: 10px 14px; font-size: 17px; line-height: 1.35; display: flex; align-items: center; }
+.case .sym { border: 2px dashed var(--before); color: var(--fg); background: var(--before-soft); gap: 10px; }
+.case .cau { border: 1px solid var(--border); background: var(--card); color: var(--fg-2); }
+.case .fix { border: 1.5px solid var(--after); background: var(--after-soft); color: var(--fg); flex-direction: column; align-items: flex-start !important; justify-content: center; gap: 4px; }
+.case .ar { display: grid; place-items: center; color: var(--slate); font-size: 20px; }
+.colh { font-family: var(--font-mono); font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.pstep { position: absolute; left: 560px; width: 520px; height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); font-size: 22px; color: var(--fg-2); }
+.pstep .ok { margin-left: auto; color: var(--after); font-family: var(--font-mono); opacity: 0; }
+.pstep.lit { border-color: var(--after); color: var(--fg); }
+a.lk { font-family: var(--font-mono); font-size: 13px; color: #8a99b3; text-decoration: none; border-bottom: 1px dotted #4b5a78; pointer-events: auto; }
+a.lk:hover { color: var(--after); border-bottom-color: var(--after); }
+a.box { text-decoration: none; pointer-events: auto; }
+a.box:hover { border-color: var(--after); }
+.lab2 { position: absolute; display: flex; flex-direction: column; gap: 6px; }
+.lab2 .t { font-size: 19px; color: var(--fg-2); white-space: nowrap; }
+.lchip { position: absolute; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--after); background: #0e1a30; border-radius: 10px; font-family: var(--font-mono); font-size: 14px; color: var(--fg); white-space: nowrap; }
+.lchip a { color: var(--fg); text-decoration: none; border-bottom: 1px dotted #4b5a78; pointer-events: auto; }
+.bars i { display: block; height: 9px; border-radius: 4px; background: #33415e; margin-top: 8px; }
+.bars i.d { background: transparent; border: 2px dashed var(--before); height: 11px; }
+.lane { position: absolute; left: 600px; width: 180px; text-align: right; font-size: 20px; color: var(--fg-2); }
+.wePair .weDoc { animation: weDoc 2.6s ease-in-out infinite; transform-box: fill-box; }
+.wePair .weLine { animation: weDash 1.3s linear infinite; }
+@keyframes weDoc { 0%, 8% { transform: translateX(0); } 46%, 54% { transform: translateX(46px); stroke: #5ab4e8; } 92%, 100% { transform: translateX(0); } }
+@keyframes weDash { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .wePair .weDoc, .wePair .weLine { animation: none; } }
+</style>
+</head>
+<body>
+<div id="help">← → move · N notes · F fullscreen</div>
+<div id="viewport"><div id="stage">
+<div id="progress"></div>
+<svg id="map" width="1600" height="900" viewBox="0 0 1600 900"><g id="mapg"></g></svg>
+<div id="scrim"></div>
+
+<!-- 1 Title -->
+<section class="slide" data-title="Title" data-anim="title" data-view="title">
+  <div class="p" style="left:96px; top:300px; width:640px">
+    <div class="kicker h"><span class="after">●</span> Engineering practice</div>
+    <h1 class="h">How we work:<br>layered context</h1>
+    <p class="cap h mono" style="margin-top:30px">Nudin · October 2026</p>
+    <div class="h wePair" style="display:flex; align-items:center; gap:14px; margin-top:22px">
+      <svg width="132" height="40" viewBox="0 0 132 40" aria-hidden="true">
+        <circle cx="16" cy="13" r="7" fill="none" stroke="#cc79a7" stroke-width="2.2"/>
+        <path d="M4 36 C 5 24, 27 24, 28 36" fill="none" stroke="#cc79a7" stroke-width="2.2"/>
+        <path class="weLine" d="M36 20 H96" stroke="#475569" stroke-width="1.6" stroke-dasharray="3 5"/>
+        <rect class="weDoc" x="38" y="13" width="11" height="14" rx="2" fill="#0b1120" stroke="#cbd5e1" stroke-width="1.6"/>
+        <g stroke="#5ab4e8" stroke-width="2.4" stroke-linecap="round"><path d="M116 8 V32 M104 20 H128 M107.5 11.5 L124.5 28.5 M124.5 11.5 L107.5 28.5"/></g>
+      </svg>
+      <span class="mono" style="font-size:17px; color:var(--muted)">we = one engineer + an AI agent</span>
+    </div>
+  </div>
+  <aside class="notes">A quick note: 'we' is one engineer and an AI coding agent. Most of this talk is about how the two split the work. This talk is about how I work, not about what I build. The picture on the right stays with us for the whole talk. It shows five places where context lives: the team docs in Lark, the code, a personal notes vault in Obsidian, the agent's memory files, and the working sessions. Each slide zooms into one of them, or into one arrow between them, so you always know which part we are talking about. Part 1 is about how the context is split up. Part 2 is about how changes ship. Part 3 is about agents and evidence.</aside>
+</section>
+
+<section class="slide" data-title="Hook" data-anim="hook" data-view="sessL">
+  <div class="kicker h">A failure first</div>
+  <h2 class="h">Confident work on the wrong thing</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa hl1" d="M782 250 C 820 250, 830 284, 858 288" data-c="#94a3b8" data-w="2"/>
+    <path class="sa hl1" d="M782 326 C 820 326, 830 296, 858 292" data-c="#94a3b8" data-w="2"/>
+    <path class="sa hl2" d="M944 290 L1096 290" data-c="#e8743b" data-w="2.5"/>
+    <path class="sa hl3" d="M782 486 C 870 486, 900 450, 900 394" data-c="#94a3b8" data-w="2" data-dash="6 6"/>
+  </svg>
+  <div class="p small mono hk0" style="left:380px; top:196px">local files</div>
+  <div class="p card hk1" style="left:380px; top:222px; width:400px; height:56px; padding:0 18px; display:flex; align-items:center; font-size:18px">▤ &nbsp;unused migrations on the branch</div>
+  <div class="p card hk1" style="left:380px; top:298px; width:400px; height:56px; padding:0 18px; display:flex; align-items:center; font-size:18px">▤ &nbsp;a draft doc that looked like a brief</div>
+  <div class="p hka" style="left:858px; top:248px; width:84px; height:84px; border-radius:50%; border:2px solid var(--after); display:grid; place-items:center; font-size:40px; color:var(--after); background:var(--bg)">✳</div>
+  <div class="p small mono hka" style="left:858px; top:340px; width:84px; text-align:center">agent</div>
+  <div class="p small mono hka" style="left:780px; top:362px; width:240px; text-align:center; font-size:13px; white-space:nowrap"><span class="muted">○</span> new session · no memory</div>
+  <div class="p card hkr" style="left:1100px; top:240px; width:420px; height:100px; padding:14px 20px; border:2px dashed var(--before); background:var(--before-soft)"><div style="font-size:22px"><span class="before">⚠</span> Confident, wrong work</div><div class="small" style="margin-top:6px">built the wrong feature, then reverted it</div></div>
+  <div class="p card hkl" style="left:380px; top:440px; width:400px; height:92px; padding:14px 20px; border-color:var(--after)"><div style="font-size:20px">▤ team docs (Lark) · the real scope</div><div class="small" style="margin-top:6px">a person had to supply it</div></div>
+  <div class="p small mono hkx" style="left:912px; top:410px"><span class="before" style="font-size:18px">✕</span> never in context</div>
+  <div class="p small mono hk2" style="left:786px; top:204px; font-size:13px">infers scope from what it finds</div>
+  <p class="p hkq" style="left:380px; top:580px; width:1140px; font-size:21px; color:var(--fg-2)">Unstructured context: an agent with no memory builds on whatever it finds, and guesses the rest with full confidence.</p>
+  <p class="p hkq" style="left:380px; top:640px; width:1140px; font-size:36px; font-weight:600; color:var(--fg)">So where should each kind of context live?</p>
+  <aside class="notes">I want to start with a failure, and the mechanism behind it. An agent starts every session with no memory, so it builds its picture of the task from whatever context it finds nearby: local files, leftovers on the branch, a draft that looks like a brief. If the real source is not where it looks, it infers the rest and builds on that guess with full confidence. Here is the real case. An agent was asked to complete a set of APIs on a branch. It looked at what was local: two database migrations that nothing used yet, and a draft document in the docs folder whose rules matched one of them. It read like a brief. The agent started to build, edited two files, and then had to revert both. The real scope was a page in the team docs, which live in Lark, and a person had to supply it, and that page described a different feature. The code it wrote was not the problem. It was confident, consistent work on the wrong thing, because the right context was not in the session. So the question for this talk is: where should each kind of context live, so that the right piece is in front of a person or an agent at the right time?</aside>
+</section>
+
+<section class="slide" data-title="Five layers" data-anim="layers" data-view="layers">
+  <div class="kicker h">Part 1 · Context is layered</div>
+  <h2 class="h">Five layers, five jobs</h2>
+  <div class="lab2 a" data-node="lark" style="left:925px; top:244px"><span class="t">Team docs (Lark): humans and agents</span><span class="pips" data-n="5"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="code" style="left:336px; top:596px"><span class="t">What is built, checked against Lark</span><span class="pips" data-n="4"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="vault" style="left:1069px; top:596px"><span class="t">Personal notes (Obsidian): why, for later</span><span class="pips" data-n="3"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="memory" style="left:925px; top:752px"><span class="t">Agent memory files: working agreements</span><span class="pips" data-n="2"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="sessions" style="left:580px; top:648px; align-items:flex-end"><span class="t">Scratch, thrown away</span><span class="pips" data-n="1"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="p small" style="left:1100px; top:196px; text-align:right; width:420px"><span class="pips" style="display:inline-flex; vertical-align:-2px"><i class="f"></i></span>&nbsp; review bar: how much people check this layer</div>
+  <div class="p a small" style="left:96px; top:752px; width:440px">Shared is what outlives a person, and what a team can take away.</div>
+  <div class="p a small" style="left:96px; top:800px">Jira: tickets in markdown, linked from PRs.</div>
+  <aside class="notes">Each layer has one job and one audience. Lark is read by humans and by agents, so it has the highest bar for quality. The code is what is actually built, and I check it against Lark. The vault keeps the reasons for decisions, for whoever reads it later. Memory holds the working agreements between me and an AI agent, such as how to write commits. Sessions are scratch space: they are thrown away when the task is done. The squares on the right show how high the bar is for each layer. Jira sits beside all this: tickets are written in markdown and linked from the pull requests. The small badges show which layers are shared and which are local. Lark, the team docs, and the code, the repo, are shared: the whole team can read them. The vault, the author's notes, and memory, the agent memory files, are local to one machine, and sessions are local and temporary. Shared is what outlives a person, and what a team can take away. That is why longevity needs the shared layers.</aside>
+</section>
+
+<section class="slide" data-title="Why the docs outrank the code" data-anim="larkc" data-view="larkcode">
+  <div class="kicker h">Part 1 · Team docs</div>
+  <h2 class="h">Why the docs outrank the code</h2>
+  <svg class="ov x" width="1600" height="900">
+    <g class="lkV"><path class="sa" d="M681 300 C 690 280, 680 250, 698 250" data-c="#e8743b" data-w="2.5" data-dash="7 6"/><path class="sa" d="M930 250 L962 250" data-c="#e8743b" data-w="2.5" data-dash="7 6"/></g>
+    <g class="lkS"><path class="sa" d="M681 320 C 690 340, 680 370, 698 370" data-c="#5ab4e8" data-w="2.5"/><path class="sa" d="M930 370 L950 370" data-c="#5ab4e8" data-w="2.5"/><path class="sa" d="M996 362 C 1010 344, 1012 330, 1030 330" data-c="#5ab4e8" data-w="2.5"/><path class="sa" d="M996 378 C 1010 396, 1012 410, 1030 410" data-c="#5ab4e8" data-w="2.5"/></g>
+  </svg>
+  <div class="eq bad lkNe" style="left:237px; top:385px">≠</div>
+  <div class="eq bad lkNe" style="left:647px; top:293px">≠</div>
+  <div class="p lkVb hatch" style="left:700px; top:224px; width:230px; height:52px; border-radius:10px; display:flex; align-items:center; gap:8px; padding:0 14px; font-size:17px; color:var(--fg); border:2px dashed var(--before);">code is the reference</div>
+  <div class="p lkVb hatch" style="left:966px; top:224px; width:254px; height:52px; border-radius:10px; display:flex; align-items:center; gap:8px; padding:0 14px; font-size:17px; color:var(--fg); border:2px dashed var(--before);"><span class="before">⚠</span> the bug is now the spec</div>
+  <div class="p lkSb" style="left:700px; top:344px; width:230px; height:52px; border-radius:10px; display:flex; align-items:center; gap:8px; padding:0 14px; font-size:17px; color:var(--fg); border:2px solid var(--after); background:var(--card);">the docs are the reference</div>
+  <div class="p lkSb" style="left:952px; top:350px; width:40px; height:40px; border-radius:50%; border:2px solid var(--warn); background:var(--warn-soft); color:var(--warn); display:grid; place-items:center; font-size:22px; font-weight:700">?</div>
+  <div class="p small lkSb" style="left:884px; top:298px; width:130px; text-align:center; font-size:13px; line-height:1.35; color:var(--fg-2)">is the doc wrong,<br>or the code?</div>
+  <div class="p lkSb" style="left:1032px; top:312px; width:188px; height:36px; border-radius:10px; display:flex; align-items:center; gap:8px; padding:0 14px; font-size:17px; color:var(--fg); border:2px solid var(--after); background:var(--card); font-size:16px;">fix the doc<span class="mono" style="margin-left:auto; width:26px; height:26px; border-radius:50%; border:1.5px solid var(--after); color:var(--after); display:grid; place-items:center; font-size:16px">=</span></div>
+  <div class="p lkSb" style="left:1032px; top:392px; width:188px; height:36px; border-radius:10px; display:flex; align-items:center; gap:8px; padding:0 14px; font-size:17px; color:var(--fg); border:2px solid var(--after); background:var(--card); font-size:16px;">fix the code<span class="mono" style="margin-left:auto; width:26px; height:26px; border-radius:50%; border:1.5px solid var(--after); color:var(--after); display:grid; place-items:center; font-size:16px">=</span></div>
+  <p class="p small lkCap" style="left:700px; top:452px; width:520px; font-size:15px; color:var(--muted)">Something must be the reference. Code can’t say it is wrong; tests only say it matches the tests.</p>
+  <div class="p" style="left:1250px; top:224px; width:270px; display:flex; flex-direction:column; gap:8px">
+    <div class="lkC"><div style="border:1.5px solid var(--after); border-radius:10px; padding:7px 12px; font-size:15px; line-height:1.3; color:var(--fg-2); background:var(--card)">holds intent; code holds one attempt<div style="font-size:13px; margin-top:4px; color:var(--muted)"><span class="prod">●</span> drafted by a person first</div></div></div>
+    <div class="lkC"><div style="border:1.5px solid var(--after); border-radius:10px; padding:7px 12px; font-size:15px; line-height:1.3; color:var(--fg-2); background:var(--card)">a check sits outside what it checks</div></div>
+    <div class="lkC"><div style="border:1.5px solid var(--after); border-radius:10px; padding:7px 12px; font-size:15px; line-height:1.3; color:var(--fg-2); background:var(--card)">code changes in an hour; intent under a person’s review</div></div>
+    <div class="lkC"><div style="border:1.5px solid var(--after); border-radius:10px; padding:7px 12px; font-size:15px; line-height:1.3; color:var(--fg-2); background:var(--card)">outlives any one person</div></div>
+    <div class="lkC"><div style="border:1.5px solid var(--after); border-radius:10px; padding:7px 12px; font-size:15px; line-height:1.3; color:var(--fg-2); background:var(--card)">answers without asking: people and agents read it</div></div>
+  </div>
+  <div class="p lkStrip" style="left:700px; top:604px; width:820px; height:64px; display:flex; align-items:center; gap:12px">
+    <div style="flex:1; height:100%; border:2px solid var(--after); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--fg)">What should happen? <span class="after" style="margin:0 8px">→</span> the docs</div>
+    <div class="mono" style="width:120px; text-align:center; font-size:12px; line-height:1.35; color:var(--muted); border-left:1px solid #475569; border-right:1px solid #475569; padding:4px 6px">each first for its own question</div>
+    <div style="flex:1; height:100%; border:2px solid var(--after); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--fg)">What does happen? <span class="after" style="margin:0 8px">→</span> running code</div>
+  </div>
+  <div class="p card wast" style="left:700px; top:684px; width:820px; height:72px; padding:10px 20px; border:2px solid var(--warn); background:var(--warn-soft); display:flex; gap:16px; align-items:center"><div class="ico" style="width:44px; height:44px; font-size:23px; color:var(--warn); border-color:var(--warn)">⚠</div><div style="font-size:19px; color:var(--fg); line-height:1.35">Updated in the same change as the code, or it is worse than no doc.</div></div>
+  <aside class="notes">The code and the doc will disagree sometimes. When they do, one of them has to be the reference. If it is the code, every bug quietly becomes the spec, and nothing is left to argue with. With the team docs as the reference, a mismatch becomes a question: is the doc wrong, or the code? Either answer is a fix. The doc earns that place for a few reasons. It holds intent: the designer drafts the design there first, and the code is one attempt at it. A check has to sit outside the thing it checks; code cannot tell you it is wrong, and tests only tell you it matches the tests. And with agents, code is cheap: a feature is rewritten in an hour and branches are rebuilt all week, while the doc changes slowly, under a person's review. When building gets fast, deciding what to build is the slow part, so that is what gets anchored. It also outlives any one person, and it answers questions without anyone having to ask the author; other teams, product people and an agent with no memory can all read it. The limit is real. The team docs say what should happen; only running code says what does. Each is first for its own question, which is why the next slide ends with running it. The footer is the price: a stale doc is worse than none, so it changes in the same PR as the code. How it stays usable: it holds the current contract with no history, it is written in plain English, agents edit one block at a time, and the tools use the user's own login.</aside>
+</section>
+
+<section class="slide" data-title="Consistency" data-anim="consist" data-view="larkIn">
+  <div class="kicker h">Part 1 · Inside Lark</div>
+  <h2 class="h">Consistency is the test</h2>
+  <div class="x">
+    <div class="doc dc" style="left:200px; top:280px"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div class="t">API contract</div><div class="s">REST · WebSocket</div></div></div>
+    <div class="doc dc" style="left:520px; top:280px"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div class="t">Resource doc</div><div class="s">routes · rules</div></div></div>
+    <div class="doc dc" style="left:840px; top:280px"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div class="t">Data model</div><div class="s">tables · phases</div></div></div>
+    <div class="doc dc" style="left:1160px; top:280px"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div class="t">Load-test results</div><div class="s">levels · findings</div></div></div>
+    <!-- horizontal links between docs -->
+    <div class="lnk lh" style="left:440px; top:335px; width:80px; height:3px"></div>
+    <div class="lnk lh" style="left:760px; top:335px; width:80px; height:3px"></div>
+    <div class="lnk lh" style="left:1080px; top:335px; width:80px; height:3px"></div>
+    <div class="p" id="driftLine" style="left:440px; top:334px; width:80px; height:0; border-top:4px dashed var(--before); opacity:0"></div>
+    <div class="eq eh" style="left:463px; top:320px">=</div>
+    <div class="eq eh" style="left:783px; top:320px">=</div>
+    <div class="eq eh" style="left:1103px; top:320px">=</div>
+    <div class="eq bad" id="driftEq" style="left:463px; top:320px; opacity:0">≠</div>
+    <!-- vertical links down to code -->
+    <div class="lnk lv" style="left:319px; top:392px; width:3px; height:118px"></div>
+    <div class="lnk lv" style="left:639px; top:392px; width:3px; height:118px"></div>
+    <div class="lnk lv" style="left:959px; top:392px; width:3px; height:118px"></div>
+    <div class="lnk lv" style="left:1279px; top:392px; width:3px; height:118px"></div>
+    <div class="eq ev" style="left:303px; top:434px">=</div>
+    <div class="eq ev" style="left:623px; top:434px">=</div>
+    <div class="eq ev" style="left:943px; top:434px">=</div>
+    <div class="eq ev" style="left:1263px; top:434px">=</div>
+    <div class="box base" id="depCode" style="left:200px; top:510px; width:1200px; height:56px; gap:12px"><span style="color:var(--after)">&lt;/&gt;</span> deployed code</div>
+    <div class="p" id="driftCall" style="left:220px; top:596px; width:760px; border:2px dashed var(--before); border-radius:12px; background:rgba(11,17,32,.85); padding:12px 18px">
+      <div style="font-size:20px"><span class="before">⚠ ≠</span>&nbsp; an event's field names drifted from the contract: <span class="mono" style="font-size:17px">storeId → storeIds</span></div>
+      <div class="small" style="margin-top:4px">Drifted for months. Found by comparing the docs, not by reading code.</div>
+    </div>
+    <p class="p" id="consistPoint" style="left:220px; top:712px; width:1160px; font-size:24px; color:var(--fg-2)">When the layers agree, trust them by default. When they disagree, you know exactly where to look.</p>
+    <p class="p" id="consistSub" style="left:220px; top:760px; width:1160px; font-size:18px; color:var(--muted)">The rare case where they agree and are both wrong is what running it catches.</p>
+  </div>
+  <aside class="notes">Inside Lark there are several documents that describe the same system from different sides: the API contract, a resource doc, the data model and the load-test results. They must agree with each other, and they must agree with the deployed code. When I check consistency, I compare the documents with each other first. This found a real drift: an event in the API contract still used old field names, such as storeId, while the resource doc and the code had moved to storeIds. It had been wrong for months. Nobody found it by reading the code. It showed up because two documents disagreed. So consistency is the everyday check, and the main signal I use for judgement: it is cheap, it runs all the time, and when two layers disagree it points at the exact place to look. Its one blind spot is a gap the layers share: if they agree and are both wrong, nothing disagrees. That rare case is why the deck also runs things, and the next slide shows one.</aside>
+</section>
+
+<section class="slide" data-title="It starts with a draft" data-anim="loop" data-view="loop">
+  <div class="kicker h">Part 1 · The fast loop</div>
+  <h2 class="h">It starts with a draft</h2>
+  <div class="p" style="left:920px; top:212px; width:600px; display:flex; flex-direction:column; gap:11px">
+    <div class="small mono sth">the fast loop · ① draft and build</div>
+    <div class="step st" data-node="lark"><span class="n">1</span><span class="t">The designer drafts the base design</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="lark"><span class="n">2</span><span class="t">An agent polishes it</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="code"><span class="n">3</span><span class="t">Code built against the draft</span><span class="tag">CODE</span></div>
+    <div class="small mono sth" style="margin-top:8px">② check and question</div>
+    <div class="step st" data-node="lark"><span class="n">4</span><span class="t">A routes doc lists one entity type, not its variants</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="vault"><span class="n">5</span><span class="t">History: written before variants</span><span class="tag">VAULT</span></div>
+    <div class="step st" data-node="code"><span class="n">6</span><span class="t">Doc and code had the same gap; running it found it</span><span class="tag">CODE</span></div>
+    <div class="step st" data-node="lark"><span class="n">7</span><span class="t">Build, verify, update the doc</span><span class="tag">LARK</span></div>
+  </div>
+  <aside class="notes">The loop starts with a person's draft, and an agent polishes the presentation: the structure, the wording and the diagrams. Only after that come the questions and the consistency checks. Here is a real one, and it is the rare case from the last slide: the doc and the code shared the same gap. A routes doc listed one entity type and not its variants. The vault notes and the document history showed why: those sections were written before variants existed. And the code had the same gap. The layers agreed, so nothing pointed at it; running it found it. Then I built the routes, had them reviewed and pushed, deployed them to staging and checked them there. The last step is to update the Lark page, so the layers agree again, and this time they are right. The loop always ends back in Lark.</aside>
+</section>
+
+<section class="slide" data-title="Vault" data-view="vault">
+  <div class="kicker h">Part 1 · Vault</div>
+  <h2 class="h">The vault keeps the why</h2>
+  <div class="p" style="left:660px; top:212px; width:860px; display:flex; flex-direction:column; gap:16px">
+    <div class="note a">
+      <div class="small mono" style="margin-bottom:6px">vault note · scope</div>
+      <div class="q">“Scope comes from the Lark page.” <span class="small">(the opening story)</span></div>
+      <div class="r">If the source doc is not in context, ask for it before you write code.</div>
+    </div>
+    <div class="note a">
+      <div class="small mono" style="margin-bottom:6px">vault note · API design</div>
+      <div class="q">“PATCH scope moves via a body field: reversed within a day.”</div>
+      <div class="r">The fix was folded into the original commits. Git history shows only the new rule. The note keeps the reasoning.</div>
+    </div>
+    <div class="a" style="display:grid; grid-template-columns: 1.35fr 1fr; gap:16px; margin-top:4px">
+      <div class="card" style="padding:16px 20px; border-color:var(--after)"><div class="small mono after" style="margin-bottom:10px">✓ IN</div><span class="chipi">decisions</span><span class="chipi">reversals</span><span class="chipi">accepted risks</span><span class="chipi">pitfalls</span></div>
+      <div class="card" style="padding:16px 20px"><div class="small mono" style="margin-bottom:10px">✕ OUT</div><div style="font-size:19px; color:var(--fg-2)">Current state. It belongs in Lark and in the code.</div></div>
+    </div>
+    <div class="small a" style="margin-top:2px">Recorded when it matters, recalled before acting.</div>
+    <div class="small a" style="margin-top:-8px"><span class="after">↳</span> No vault? Keep a Decisions section at the bottom of the doc page, or put it in the PR description.</div>
+  </div>
+  <aside class="notes">The vault is an Obsidian vault of short notes about decisions. Decisions are recorded when they matter, which depends on someone remembering to do it, and recalled before acting. It is a record of reasoning, not documentation of the current state. Two real examples. The first is the note from the opening story; the rule that came out of it is to ask for the source document before writing code, if it is not in context. In the second, a design for how a PATCH changes a record's store scope was reversed within a day after review. The fix was folded into the original commits, so git history only shows the new rule. Without the note, the reason would be lost. What goes in: decisions, reversals, accepted risks and pitfalls. What stays out: the current state, which belongs in Lark and in the code. If a team has no vault, a Decisions section at the bottom of the doc page, or the PR description, does the same job.</aside>
+</section>
+
+<section class="slide" data-title="Read on demand" data-anim="ondemand" data-view="memsess">
+  <div class="kicker h">Part 1 · Memory and sessions</div>
+  <h2 class="h">Read on demand</h2>
+  <svg class="ov x" id="fanSvg" width="1600" height="900"></svg>
+  <div class="p" style="left:850px; top:205px; width:670px; display:flex; flex-direction:column; gap:16px">
+    <div class="load a"><span class="n">1</span><div class="t">Agent instructions file <span>· e.g. CLAUDE.md</span></div></div>
+    <div class="load a"><span class="n">2</span><div class="t" style="flex:1">Rules files by precedence
+      <pre class="code" style="margin-top:8px; font-size:14px"><span class="c"># project index</span>
+rules: <span class="s">constitution &gt; security &gt; conventions</span> <span class="c">(example)</span></pre></div></div>
+    <div class="load a"><span class="n">3</span><div class="t" style="flex:1">Memory index <span>· one line per fact, files linked</span>
+      <pre class="code" style="margin-top:8px; font-size:14px">- [<span class="f">Commit messages: short and factual</span>](feedback_commit_message_brevity.md) — one-line subject, no verbose body or self-justification
+…</pre></div></div>
+    <div class="load a"><span class="n">4</span><div class="t">Vault notes <span>· by search</span></div></div>
+    <div class="load a"><span class="n">5</span><div class="t">Lark pages <span>· by link</span></div></div>
+    <p class="a" style="font-size:24px; color:var(--fg); margin-top:6px">Small, linked pieces beat one big document.</p>
+  </div>
+  <aside class="notes">A session does not load everything. It starts from CLAUDE.md, which is short and mostly links. The rules files are loaded only when a task touches them, and when two of them conflict the order is fixed: the constitution, then security, then the service conventions, then the pattern guides. The memory index has one line per fact, and each line links to a file with the detail, so the session reads the line and opens the file only when it matters. Vault notes are found by search, and Lark pages are opened by link. The result is that each task carries only the context it needs. Small, linked pieces work better than one big document, because a big document is either loaded whole or not at all.</aside>
+</section>
+
+<section class="slide" data-title="Links, not names" data-anim="links" data-view="links">
+  <div class="kicker h">Part 1 · Connectivity</div>
+  <h2 class="h">Links, not names</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa lkl" d="M282 252 C 400 196, 560 196, 668 244" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa lkl" d="M822 250 C 1030 290, 1050 520, 1020 588" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa lkl" d="M1000 624 C 880 720, 400 720, 200 626" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa lkl" d="M150 590 C 96 500, 96 360, 170 272" data-c="#5ab4e8" data-w="2"/>
+  </svg>
+  <div class="lchip lc" style="left:668px; top:228px">▤ Lark page</div>
+  <div class="lchip lc" style="left:960px; top:590px">◆ vault note</div>
+  <div class="lchip lc" style="left:136px; top:592px">⑂ PR</div>
+  <div class="lchip lc" style="left:150px; top:236px">◎ Jira issue</div>
+  <div class="p a" style="left:1110px; top:220px; width:410px">
+    <div class="small mono" style="margin-bottom:8px">✕ a note with names</div>
+    <div style="border:2px dashed var(--before); border-radius:12px; padding:14px 18px; font-size:19px; line-height:1.7; color:var(--fg-2)">
+      fixed in <span class="mono" style="border-bottom:2px dashed var(--before)">#1234</span><br>
+      see <span style="border-bottom:2px dashed var(--before)">the API doc</span><br>
+      per <span style="border-bottom:2px dashed var(--before)">the ticket</span>
+    </div>
+    <div class="small" style="margin-top:6px"><span class="before">✕</span> nothing to follow</div>
+  </div>
+  <p class="p a" style="left:1110px; top:480px; width:410px; font-size:24px; color:var(--fg)">Connected context is robust context.</p>
+  <aside class="notes">Every reference I write is a real link: the pull request URL instead of a bare number like #1234, the Lark wiki link instead of "the API doc", the Jira issue link instead of "the ticket", and commit links. A link can be followed by a person or by an agent. A bare number or a name cannot: the reader has to guess which repository, which page, which ticket. On the map, the links tie the layers together: a Lark page points to the PR, the PR points to the Jira issue, the vault note points to both. The note on the right has the same information as names only, and nothing in it can be followed. Connected context is robust context.</aside>
+</section>
+
+<section class="slide" data-title="Say it once" data-anim="once" data-view="lark">
+  <div class="kicker h">Part 1 · Connectivity</div>
+  <h2 class="h">Say it once, link it everywhere</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa onl" d="M916 572 C 800 572, 760 500, 688 492" data-c="#5ab4e8" data-w="2.5"/>
+    <path class="sa onl" d="M916 642 C 790 642, 760 530, 688 520" data-c="#5ab4e8" data-w="2.5"/>
+    <path class="sa onl" d="M916 712 C 780 712, 760 560, 688 548" data-c="#5ab4e8" data-w="2.5"/>
+  </svg>
+  <div class="p" style="left:760px; top:212px; width:760px">
+    <div class="small mono a" style="margin-bottom:10px"><span class="before">✕</span> copied three times</div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:18px">
+      <div class="card a cp" style="padding:14px 18px"><div class="mono" style="font-size:15px; color:var(--fg-2)">PR body</div><div class="bars"><i style="width:95%"></i><i style="width:80%"></i><i class="d" style="width:60%"></i><i style="width:85%"></i></div></div>
+      <div class="card a cp" style="padding:14px 18px"><div class="mono" style="font-size:15px; color:var(--fg-2)">code comment</div><div class="bars"><i style="width:95%"></i><i class="d" style="width:70%"></i><i style="width:65%"></i><i style="width:85%"></i></div></div>
+      <div class="card a cp" style="padding:14px 18px"><div class="mono" style="font-size:15px; color:var(--fg-2)">Jira ticket</div><div class="bars"><i style="width:95%"></i><i style="width:80%"></i><i style="width:65%"></i><i class="d" style="width:50%"></i></div></div>
+    </div>
+    <div class="small a" style="margin-top:8px"><span class="before">- - -</span> the copies drift apart</div>
+  </div>
+  <div class="p small mono a" style="left:920px; top:520px"><span class="after">✓</span> said once, in Lark</div>
+  <div class="lchip ch" style="left:920px; top:556px">PR body · link</div>
+  <div class="lchip ch" style="left:920px; top:626px">code comment · link</div>
+  <div class="lchip ch" style="left:920px; top:696px">Jira ticket · link</div>
+  <p class="p small a" style="left:760px; top:772px; width:760px; font-size:15px">“Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.” Hunt and Thomas, <i>The Pragmatic Programmer</i></p>
+  <aside class="notes">The long explanation lives once, in Lark. Code comments, PR descriptions and Jira tickets stay short and link to it. They do not explain it again. When the same paragraph is pasted into a PR, a comment and a ticket, the three copies drift apart as each one is edited on its own, and a reader cannot tell which one is right. With one Lark section and three short links, there is nothing to drift. The structure also carries meaning: where a piece of writing lives tells the reader what it is. A Lark page is the contract, a PR body is the change, a vault note is the reason. This is the DRY principle from Andrew Hunt and David Thomas, The Pragmatic Programmer, Addison-Wesley, 1999: "Every piece of knowledge must have a single, unambiguous, authoritative representation within a system." It also matches the Diátaxis framework by Daniele Procida, which keeps explanation and reference apart.</aside>
+</section>
+
+<section class="slide" data-title="Four phases" data-anim="loops2" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship</div>
+  <h2 class="h">Four phases, one loop inside each</h2>
+  <p class="p lq" style="left:360px; top:206px; font-size:38px; font-weight:600; color:var(--fg)">“Make it work, make it right, make it fast.”</p>
+  <p class="p small lqk" style="left:360px; top:264px; font-size:16px">Kent Beck · with one step in front: design it</p>
+  <div class="p card ph" style="left:360px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#cc79a7; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#cc79a7">1</span><span style="font-size:22px; font-weight:600">Design it</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">a person drafts the base design in Lark</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
+  <div class="p pha" style="left:632px; top:418px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p card ph" style="left:656px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">2</span><span style="font-size:22px; font-weight:600">Make it work</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">features built against the draft</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
+  <div class="p pha" style="left:928px; top:418px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p card ph" style="left:952px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">3</span><span style="font-size:22px; font-weight:600">Make it right</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">structure, refactors, tests</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
+  <div class="p pha" style="left:1224px; top:418px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p card ph" style="left:1248px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">4</span><span style="font-size:22px; font-weight:600">Make it fast</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">measure under load, change what the numbers show</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
+  <div class="p tll" style="left:360px; top:546px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--fg-2)"><svg width="26" height="26" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg><span><b style="color:var(--after)">the fast loop</b>, inside every phase: draft → polish → build → check → questions → update Lark</span></div>
+  <p class="p tlp" style="left:360px; top:620px; width:1160px; font-size:23px; color:var(--fg)">The order matters: tuning before the structure settles tunes code that is about to change.</p>
+  <aside class="notes">Part 2 is about how changes ship, and it starts with a phrase attributed to Kent Beck: make it work, make it right, make it fast. I put one step in front of it: design it. So the work moves through four phases. Design it: a person drafts the base design in Lark. Make it work: the features are built against that draft. Make it right: structure, refactors and tests that find bugs early. Make it fast: measure under load, and change only what the numbers show. These phases overlap in practice. Inside every phase, the fast loop from Part 1 turns many times: draft, polish, build, check, questions, update Lark. The order matters. If you tune before the structure settles, you tune code that is about to change. Later slides map onto it: the refactors slide is make it right, and the evidence slide is make it fast.</aside>
+</section>
+
+<section class="slide" data-title="Code shape" data-anim="shape" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship</div>
+  <h2 class="h">Checking the code by its shape</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa" id="shOk" d="M690 398 L624 398" data-c="#5ab4e8"/>
+    <path class="sa" id="shBad" d="M690 466 L624 466" data-c="#e8743b" data-dash="7 6"/>
+  </svg>
+  <div class="x">
+    <div class="small mono p shc" style="left:360px; top:205px">layers · one direction only</div>
+    <div class="box shb" style="left:360px; top:240px; width:262px; height:44px">routes</div>
+    <div class="box shb" style="left:360px; top:308px; width:262px; height:44px">controllers</div>
+    <div class="box shb on" style="left:360px; top:376px; width:262px; height:44px">SDK services</div>
+    <div class="box shb" style="left:360px; top:444px; width:262px; height:44px">repositories</div>
+    <div class="box shb base" style="left:360px; top:512px; width:262px; height:44px">database</div>
+    <div class="p shg" style="left:400px; top:295px; width:200px; border-top:1.5px solid #94a3b8"></div>
+    <div class="p shg" style="left:400px; top:363px; width:200px; border-top:1.5px solid #94a3b8"></div>
+    <div class="p shg" style="left:400px; top:431px; width:200px; border-top:1.5px solid #94a3b8"></div>
+    <div class="p shg" style="left:400px; top:499px; width:200px; border-top:1.5px solid #94a3b8"></div>
+    <div class="p shg mono" style="left:372px; top:286px; color:var(--after); font-size:14px">↓</div>
+    <div class="p shg mono" style="left:372px; top:354px; color:var(--after); font-size:14px">↓</div>
+    <div class="p shg mono" style="left:372px; top:422px; color:var(--after); font-size:14px">↓</div>
+    <div class="p shg mono" style="left:372px; top:490px; color:var(--after); font-size:14px">↓</div>
+    <div class="p shg small mono" style="left:360px; top:562px; font-size:14px"><span style="display:inline-block; width:22px; border-top:1.5px solid #94a3b8; vertical-align:middle"></span> oxlint gate</div>
+    <div class="p sho card" style="left:690px; top:330px; width:290px; padding:12px 16px">
+      <div class="small mono" style="margin-bottom:12px">another service</div>
+      <div class="mono" style="font-size:14px; color:var(--fg-2); margin-bottom:22px"><span class="after">✓</span> "@sdk"</div>
+      <div class="mono" style="font-size:13px; color:var(--fg-2)"><span class="before">✕</span> "@sdk/repositories/<br>&nbsp;&nbsp;orders.repo"</div>
+    </div>
+    <div class="p shx before mono" style="left:646px; top:446px; font-size:26px; font-weight:700">✕</div>
+    <pre class="code p shl" style="left:360px; top:600px; width:620px; font-size:13.5px; border:1.5px solid #475569"><span class="c">// .oxlintrc.json · every file in src/</span>
+<span class="k">"no-restricted-imports"</span>: [<span class="s">"error"</span>, { <span class="k">"patterns"</span>: [{
+  <span class="k">"group"</span>: [<span class="s">"@sdk/*"</span>, <span class="s">"@sdk/**"</span>, …],
+  <span class="k">"message"</span>: <span class="s">"Other services use the SDK through its entry point: import from \"@sdk\". Its folders are internal."</span>
+}]}]</pre>
+    <div class="p shr" style="left:1040px; top:250px; width:480px; display:flex; flex-direction:column; gap:44px">
+      <div style="display:flex; gap:18px; align-items:center"><div class="ico" style="width:56px;height:56px"><svg viewBox="0 0 24 24" style="width:30px;height:30px"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="16" width="16" height="5" rx="1"/><path d="M6 12h12" stroke-dasharray="2 2"/></svg></div><div><div style="font-size:24px; color:var(--fg)">oxlint, a fast linter, holds the layers</div></div></div>
+      <div style="display:flex; gap:18px; align-items:center"><div class="ico" style="width:56px;height:56px"><svg viewBox="0 0 24 24" style="width:30px;height:30px"><path d="M6 21V4h12v17M3 21h18"/><circle cx="15" cy="13" r="1"/></svg></div><div><div style="font-size:24px; color:var(--fg)">SDK: one door in</div><div class="mono" style="font-size:14px; color:var(--muted); margin-top:6px">.where(<span class="after">"clientId"</span>, "=", criteria.clientId)</div></div></div>
+      <div style="display:flex; gap:18px; align-items:center"><div class="ico" style="width:56px;height:56px"><svg viewBox="0 0 24 24" style="width:30px;height:30px"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><div><div style="font-size:24px; color:var(--fg)">Tests guard the structure</div></div></div>
+    </div>
+    <p class="p shp" style="left:360px; top:790px; width:1160px; font-size:22px; color:var(--fg)">Structure is checked by tools, so review can focus on intent.</p>
+  </div>
+  <aside class="notes">Besides checking the code against Lark, I check the code as a whole by its structure, not line by line. A layering refactor gave the service one direction of calls: routes, then controllers, then the SDK services, then repositories, then the database. oxlint, a fast linter, holds those layers: a lower layer cannot import a service, the SDK cannot import the service that hosts it, folders import each other by alias so the rules can see the import, and other services can only import the SDK entry point. Reaching into its folders, for example a repository, is a lint error with the message you see. The SDK has one door in, exports only named functions, never hands out a raw database handle, and every repository takes a criteria object with the client id in it, so tenancy is part of every key: the line under that heading is the where-clause. Then there are tests that guard the structure rather than the behaviour: a tenancy-scope test over every query, a test of the SDK boundary, and round-trip tests that count queries and pool checkouts per call. Because tools check the structure, a reviewer can spend the time on intent. Excerpts adapted from production code; names generalised.</aside>
+</section>
+
+<section class="slide" data-title="Why refactors matter" data-anim="refactor" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship · <span class="tag" style="font-size:14px; letter-spacing:.06em">make it right</span></div>
+  <h2 class="h">Why refactors matter</h2>
+  <div class="p" style="left:360px; top:196px; width:1160px">
+    <div class="case a" style="margin-bottom:8px"><span class="colh">symptom</span><span></span><span class="colh">structural cause</span><span></span><span class="colh">structural fix</span></div>
+    <div style="display:flex; flex-direction:column; gap:12px">
+      <div class="case a"><div class="c sym"><span class="before">⚠</span>Writes refused while idle</div><div class="ar">→</div><div class="c cau">Limiter after auth leaked slots</div><div class="ar">→</div><div class="c fix"><span>Skip closed requests; explicit middleware order</span><span class="mono" style="font-size:12.5px; color:var(--fg-2)"><span style="color:#94a3b8">if</span> (res.closed || req.socket?.destroyed) <span style="color:#94a3b8">return</span>;</span></div></div>
+      <div class="case a"><div class="c sym"><span class="before">⚠</span>Reads slow only under load</div><div class="ar">→</div><div class="c cau">One pool checkout per query</div><div class="ar">→</div><div class="c fix">One connection per unit of work</div></div>
+      <div class="case a"><div class="c sym" style="border:1.5px solid #94a3b8; background:rgba(148,163,184,.08)"><span class="muted">◇</span>Flaky tests <span class="small" style="font-size:13px">(about tests)</span></div><div class="ar">→</div><div class="c cau">201 fixes in 51 projects: async waits, concurrency, test order</div><div class="ar">→</div><div class="c cau" style="font-size:15px !important; color:var(--muted)">Luo et al., FSE 2014</div></div>
+    </div>
+    <p class="a" style="font-size:25px; color:var(--fg); margin-top:22px">Fix the shape, and the intermittent bug stops being intermittent.</p>
+    <p class="small a" style="margin-top:10px; font-size:16px">Make illegal states unrepresentable. <span class="muted">Yaron Minsky</span></p>
+  </div>
+  <aside class="notes">Why do I still spend time on refactors? Because many bugs we call transient, intermittent or unexplainable are structural. A flaky symptom usually means the structure allows two orders or two paths, and nothing makes one of them impossible. Two real cases. One: every write was refused, even on an idle service. A concurrency limiter ran after the auth middleware, so a client that left during auth took a slot that was never released. The fix skips a request that is already closed and makes the middleware order explicit; the code line on the slide is the real guard. Two: reads were slow only under load. Each query checked out its own pool connection, sometimes while it held another, which is hold-and-wait, and one read made 20 pool checkouts. The fix is one connection per unit of work, through a held-connection scope. In both cases, a refactor that makes only one order or path possible removes the whole class of bug, not only the case we saw. The same pattern shows in test flakiness: Luo, Hariri, Eloussi and Marinov, "An Empirical Analysis of Flaky Tests", FSE 2014, studied 201 commits that fixed flaky tests in 51 open-source projects and found async waits, concurrency and test order dependency to be the most common root causes. The same idea is Yaron Minsky's "make illegal states unrepresentable", from his Effective ML talk and the Jane Street blog post of the same name, 2010: if the structure cannot express the bad state, nobody has to remember to avoid it. Excerpts adapted from production code; names generalised.</aside>
+</section>
+
+<section class="slide" data-title="Stacked PRs" data-anim="stack" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship</div>
+  <h2 class="h">Stacked PRs</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa sk" d="M560 286 L560 314" data-c="#94a3b8" data-w="2.5"/>
+    <path class="sa sk" d="M560 376 L560 404" data-c="#94a3b8" data-w="2.5"/>
+    <path class="sa sk" d="M560 466 L560 494" data-c="#94a3b8" data-w="2.5"/>
+    <path class="sa sk" d="M560 556 L560 584" data-c="#94a3b8" data-w="2.5"/>
+    <path class="sa sk2" d="M800 588 L672 604" data-c="#94a3b8" data-w="2.5"/>
+    <path class="sa sk2" d="M800 668 L672 626" data-c="#94a3b8" data-w="2.5"/>
+  </svg>
+  <div class="x">
+    <div class="box sb" style="left:450px; top:584px; width:220px; height:58px; background:#0e1729; border-color:#475569">staging</div>
+    <div class="box sb" style="left:450px; top:494px; width:220px; height:60px">PR 1</div>
+    <div class="box sb" id="pr5187" style="left:450px; top:404px; width:220px; height:60px">PR 2</div>
+    <div class="box sb" id="pr5216" style="left:450px; top:314px; width:220px; height:60px">PR 3</div>
+    <div class="box sb" id="pr5218" style="left:450px; top:224px; width:220px; height:60px">PR 4</div>
+    <div class="box sb2" style="left:800px; top:562px; width:170px; height:52px">side PR</div>
+    <div class="box sb2" style="left:800px; top:642px; width:170px; height:52px">side PR</div>
+    <div class="p small mono sb2" style="left:990px; top:620px">on staging</div>
+    <div class="p" id="fixDot" style="left:690px; top:420px; width:28px; height:28px; border-radius:50%; background:var(--after); box-shadow:0 0 18px rgba(90,180,232,.6)"></div>
+    <div class="p" id="fixLbl" style="left:736px; top:417px; font-size:20px; color:var(--fg)">a fix lands here</div>
+    <div class="p" id="cfl" style="left:736px; top:327px"><span class="tag warn">⚠ next PR would conflict</span> <span style="font-size:19px; color:var(--fg-2)">&nbsp;→ carry the fix up</span></div>
+    <div class="p" id="nocfl" style="left:736px; top:238px"><span class="tag">✓ no conflict</span> <span style="font-size:19px; color:var(--fg-2)">&nbsp;→ leave it alone</span></div>
+    <p class="p" id="stackCap" style="left:450px; top:740px; font-size:24px; color:var(--fg)">A fix moves up the stack only if the next PR would conflict.</p>
+  </div>
+  <aside class="notes">Larger work ships as a stack of pull requests. Each PR is based on the one below it, and the bottom one is based on staging: staging, then PR 1, 2, 3 and 4. Smaller, independent changes go straight onto staging as side PRs. When a fix lands in the middle of the stack, I do not push it up through every PR by habit. I move it up only if the next PR would conflict without it. A clean rebase does not need a cascade, and every extra push restarts CI and review for nothing.</aside>
+</section>
+
+<section class="slide" data-title="Linear history" data-anim="linrb" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship</div>
+  <h2 class="h">Linear history: rebase is now cheap</h2>
+  <svg class="ov x" width="1600" height="900">
+    <g id="lrA"><line x1="380" y1="252" x2="640" y2="252" stroke="#5ab4e8" stroke-width="4"/><circle cx="400" cy="252" r="10" fill="#0b1120" stroke="#5ab4e8" stroke-width="3.5"/><circle cx="476" cy="252" r="10" fill="#0b1120" stroke="#5ab4e8" stroke-width="3.5"/><circle cx="552" cy="252" r="10" fill="#0b1120" stroke="#5ab4e8" stroke-width="3.5"/><circle cx="628" cy="252" r="10" fill="#0b1120" stroke="#5ab4e8" stroke-width="3.5"/></g>
+    <g id="lrB"><path d="M700 252 L740 252 L780 222 L840 222 L880 252 M740 252 L780 282 L840 282 L880 252 L920 252" fill="none" stroke="#e8743b" stroke-width="3" stroke-dasharray="7 6"/><circle cx="880" cy="252" r="11" fill="#0b1120" stroke="#e8743b" stroke-width="3"/></g>
+    <path id="lrX" d="M766 210 L860 294 M860 210 L766 294" stroke="#e8743b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </svg>
+  <div class="p small mono lr1" style="left:380px; top:286px"><span class="after">✓</span> one straight line</div>
+  <div class="p small mono lr1" style="left:720px; top:306px"><span class="before">✕</span> no merge commits</div>
+  <pre class="code p lr2" style="left:360px; top:350px; width:560px; font-size:14px"><span class="c"># fold a fix into the commit it belongs to</span>
+git commit --fixup=&lt;sha&gt;
+GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
+  <div class="p lr3" style="left:360px; top:462px"><span class="tag after" style="font-size:14px">deploy branch = one snapshot commit · patch-id = the stack</span></div>
+  <div class="p small mono lr4" style="left:960px; top:200px">why rebase is now cheap</div>
+  <div class="p card lrc" style="left:960px; top:230px; width:560px; height:104px; padding:12px 18px; border:2px solid var(--after); background:var(--after-soft)"><div style="font-size:21px">4 commits ported to a new code layout</div><div style="font-size:16px; color:var(--fg-2); margin-top:6px"><span class="after">✓</span> each conflict resolved by an agent · full test and DB suites green</div></div>
+  <div class="p card lrc" style="left:960px; top:348px; width:560px; height:90px; padding:10px 18px"><div style="font-size:19px">8 commits replayed onto a newer base</div><div class="small" style="font-size:15px; margin-top:5px">range-diff: all unchanged, so no conflicts. The easy case.</div></div>
+  <div class="p card lrc" style="left:960px; top:452px; width:560px; height:90px; padding:10px 18px"><div style="font-size:19px">A fix folded 6 commits back</div><div class="small" style="font-size:15px; margin-top:5px">later patch-ids identical · final diff = the 23-line rule</div></div>
+  <div class="p lrw" style="left:960px; top:560px; width:560px; font-size:16px; color:var(--fg-2)"><span class="warn">⚠</span> Patch checks prove the replay changed nothing. Only tests prove it is right.</div>
+  <p class="p lrp" style="left:360px; top:690px; font-size:24px; color:var(--fg)">When rebasing is cheap and provable, keep history linear.</p>
+  <aside class="notes">History stays a straight line. There are no merge commits, not even on local throwaway branches. When a review finds a problem, the fix does not become a new commit on top: I create a fixup commit for the commit it belongs to and autosquash it in, with the two commands on the slide. A deploy branch is one snapshot commit on top of staging, and its patch-id matches the stack. Teams used to choose merge over rebase for a practical reason: a rebase made a person untangle conflicts commit by commit, often the same conflict again and again. That cost has changed, and here is the evidence. Four commits were ported into a different code layout: an agent resolved each conflict in the context of its commit, and the full test and database suites passed. That is the real test. Eight commits were replayed onto a newer base, and git range-diff showed all eight unchanged; that means there were no conflicts, which is the easy case. And a fix was folded into a commit six commits back: all six later commits kept identical patch-ids, and the final tree differed by exactly the 23-line rule. Patch checks prove that the replay changed nothing; only tests prove that it is right. When rebasing is cheap and provable, keep history linear.</aside>
+</section>
+
+<section class="slide" data-title="Push sequence" data-anim="push" data-view="code">
+  <div class="kicker h">Part 2 · How changes ship</div>
+  <h2 class="h">The push sequence</h2>
+  <div class="x">
+    <div class="p" id="pline" style="left:528px; top:236px; width:4px; height:470px; background:#22304c; border-radius:2px"><div id="plineFill" style="width:100%; height:100%; background:var(--after); transform-origin:top; transform:scaleY(0)"></div></div>
+    <div class="pstep" style="top:206px"><span class="mono muted">1</span> Local tests and DB suites<span class="ok">✓</span></div>
+    <div class="pstep" style="top:290px"><span class="mono muted">2</span> Typecheck and lint<span class="ok">✓</span></div>
+    <div class="pstep" style="top:374px"><span class="mono muted">3</span> Local Sonar scan<span class="ok">✓</span></div>
+    <div class="pstep" style="top:458px"><span class="mono muted">4</span> Review · agent drafts, person judges<span class="ok">✓</span></div>
+    <div class="pstep" style="top:542px"><span class="mono muted">5</span> Push<span class="ok">✓</span></div>
+    <div class="pstep" style="top:626px"><span class="mono muted">6</span> CI<span class="ok">✓</span></div>
+    <div class="p" id="oneAt" style="left:1160px; top:330px; width:360px">
+      <div style="font-size:30px; font-weight:600; margin-bottom:22px">One PR at a time</div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="tag after" style="font-size:19px; align-self:flex-start">PR 1 · in the pipeline</div>
+        <div class="tag" style="font-size:19px; align-self:flex-start; opacity:.55">PR 2 · waits</div>
+        <div class="tag" style="font-size:19px; align-self:flex-start; opacity:.55">PR 3 · waits</div>
+      </div>
+    </div>
+    <p class="p small" id="pushFoot" style="left:560px; top:724px; width:960px; font-size:15px">One push at a time, and each PR’s CI must finish before the next: a stack of PRs pushed together would run every CI at once and hog the shared runners.</p>
+  </div>
+  <aside class="notes">Before anything is pushed, it goes through the same sequence. First the local tests, including the suites that run against a real database. Then typecheck and lint. Then a local SonarQube scan on the changed files, so the quality gate does not fail after the push. Then a review: an agent drafts the findings, and a person judges them. Only then the push, and CI runs. A clean build alone is not enough. And I do this for one PR at a time: the next PR starts the sequence only when the current one is through. The CI runners are shared by the whole team, and a cascade push starts a full CI run for every PR in the stack at once, so waiting keeps the runners free for everyone. Waiting also means I read each result before the next change goes out.</aside>
+</section>
+
+<section class="slide" data-title="Agents" data-anim="agents" data-view="sessL">
+  <div class="kicker h">Part 3 · Agents and evidence</div>
+  <h2 class="h">Agents in parallel, a human gate</h2>
+  <svg class="ov x" width="1600" height="900" id="agSvg">
+    <line x1="800" y1="262" x2="1150" y2="262" stroke="#22304c" stroke-width="4" stroke-linecap="round"/>
+    <line x1="800" y1="338" x2="1150" y2="338" stroke="#22304c" stroke-width="4" stroke-linecap="round"/>
+    <line x1="800" y1="414" x2="1150" y2="414" stroke="#22304c" stroke-width="4" stroke-linecap="round"/>
+    <line x1="800" y1="490" x2="1150" y2="490" stroke="#22304c" stroke-width="4" stroke-linecap="round"/>
+    <circle class="agd" cx="800" cy="262" r="10" fill="#5ab4e8"/>
+    <circle class="agd" cx="800" cy="338" r="10" fill="#5ab4e8"/>
+    <circle class="agd" cx="800" cy="414" r="10" fill="#5ab4e8"/>
+    <circle class="agd" cx="800" cy="490" r="10" fill="#5ab4e8"/>
+    <rect id="gate" x="1166" y="226" width="16" height="300" rx="5" fill="#1a2540" stroke="#94a3b8" stroke-width="2"/>
+  </svg>
+  <div class="x">
+    <div class="lane agl" style="top:248px">Lark edits</div>
+    <div class="lane agl" style="top:324px">review drafts</div>
+    <div class="lane agl" style="top:400px">research</div>
+    <div class="lane agl" style="top:476px">builds</div>
+    <div class="p agg" style="left:1100px; top:540px; width:150px; text-align:center; font-size:18px; color:var(--fg)">A person<br><span class="small">approves</span></div>
+    <div class="p ago" style="left:1220px; top:240px; display:flex; flex-direction:column; gap:28px">
+      <span class="tag agc" style="font-size:18px">push</span><span class="tag agc" style="font-size:18px">deploy</span><span class="tag agc" style="font-size:18px">force-push</span><span class="tag agc" style="font-size:18px">doc publish</span>
+    </div>
+    <div class="p agt" style="left:600px; top:650px; width:920px; font-size:22px; color:var(--fg-2); line-height:1.5">Background agents work in parallel. Anything outward-facing waits at the gate.</div>
+  </div>
+  <aside class="notes">Most of the work runs in background agents, side by side: one edits a Lark page block by block, one drafts a review of a diff for a person to judge, one researches, one runs builds and tests. I do not wait for each in turn. But nothing that faces outward happens without me. A push, a deploy, a force-push or publishing a document all stop at a gate, and a person approves each one. Agents can do the work. The decision to make it visible to others stays with a person.</aside>
+</section>
+
+<section class="slide" data-title="Running it" data-anim="running" data-view="code">
+  <div class="kicker h">Part 3 · Agents and evidence</div>
+  <h2 class="h" style="font-size:40px; margin-top:8px">Agents run the tools. Tools produce the evidence. People judge.</h2>
+  <div class="p card qf" style="left:360px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">◎ Jira scenario</div><div class="small" style="font-size:14px; margin-top:6px">written by a person</div></div>
+  <div class="p card qf" style="left:640px; top:200px; width:320px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">⇆ test scenario</div><div class="small" style="font-size:14px; margin-top:6px">agent drafts · person reviews</div></div>
+  <div class="p card qf" style="left:990px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">▶ run on staging</div><div class="small" style="font-size:14px; margin-top:6px">Bruno · Playwright · k6</div></div>
+  <div class="p card qf" style="left:1270px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">= vs Lark contract</div><div class="small" style="font-size:14px; margin-top:6px">the result is checked</div></div>
+  <div class="p qfa" style="left:614px; top:226px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p qfa" style="left:964px; top:226px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p qfa" style="left:1244px; top:226px; font-size:22px; color:var(--slate)">→</div>
+  <div class="p qr" style="left:360px; top:330px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
+  <div class="p qr" style="left:360px; top:350px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">▤ unit + DB</span></div>
+  <div class="p qt" style="left:510px; top:338px; width:520px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">◫</span><div><div class="mono" style="font-size:15px; color:var(--fg)">vitest + Postgres</div><div style="font-size:13px; color:var(--muted); line-height:1.25">queries and connections per call</div></div></div>
+  <div class="p qb" style="left:1170px; top:352px; font-size:15px; color:var(--muted)"><span class="after">✓</span> runs before every push</div>
+  <div class="p qr" style="left:360px; top:414px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
+  <div class="p qr" style="left:360px; top:434px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">↻ smoke</span></div>
+  <div class="p qt" style="left:510px; top:422px; width:520px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">⇆</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Bruno</div><div style="font-size:13px; color:var(--muted); line-height:1.25">API collections vs the Lark contract</div></div></div>
+  <div class="p qb" style="left:1170px; top:422px; width:350px; height:56px; border:2px dashed var(--before); background:var(--before-soft); border-radius:10px; padding:6px 12px"><div style="font-size:15px; color:var(--fg)"><span class="before">⚠</span> Pods restarted under load</div><div style="font-size:13px; color:var(--muted)">tiny CPU request, health check timed out</div></div>
+  <div class="p qr" style="left:360px; top:498px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
+  <div class="p qr" style="left:360px; top:518px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">⇄ end to end</span></div>
+  <div class="p qt" style="left:510px; top:506px; width:520px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">▶</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Playwright</div><div style="font-size:13px; color:var(--muted); line-height:1.25">real UI screens: a live edit shows in the preview</div></div></div>
+  <div class="p qb" style="left:1170px; top:506px; width:350px; height:56px; border:2px dashed var(--before); background:var(--before-soft); border-radius:10px; padding:6px 12px"><div style="font-size:15px; color:var(--fg)"><span class="before">⚠</span> Push never sent when deployed</div><div style="font-size:13px; color:var(--muted)">boot path skipped the socket server</div></div>
+  <div class="p qr" style="left:360px; top:582px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
+  <div class="p qr" style="left:360px; top:602px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">▲ performance</span></div>
+  <div class="p qt" style="left:510px; top:590px; width:250px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">≋</span><div><div class="mono" style="font-size:15px; color:var(--fg)">k6</div><div style="font-size:13px; color:var(--muted); line-height:1.25">realistic and 3× load</div></div></div>
+  <div class="p qt" style="left:772px; top:590px; width:390px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">◔</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Grafana · Jaeger · Pyroscope</div><div style="font-size:13px; color:var(--muted); line-height:1.25">where the time goes</div></div></div>
+  <div class="p qb" style="left:1170px; top:590px; width:350px; height:56px; border:2px dashed var(--before); background:var(--before-soft); border-radius:10px; padding:6px 12px"><div style="font-size:15px; color:var(--fg)"><span class="before">⚠</span> Fast commit, slow response</div><div style="font-size:13px; color:var(--muted)">found only by reading server logs</div></div>
+  <aside class="notes">Agents run the tools. The tools produce the evidence. People judge it. The main flow starts in Jira: a person writes the test scenarios there, an agent drafts the Bruno collections and the other test scenarios from them, and the person reviews them. They run against staging, and the result is checked against the Lark contract. The tools sit in tiers. Unit and database tests, with vitest and real Postgres suites, check the query count and the connection checkouts per call, and run before every push. Bruno runs API collections against staging and checks each endpoint against the Lark contract. Playwright drives the real UI screens end to end, for example a live edit that must show up in the preview. k6 puts load on it at realistic and three times realistic levels, and Grafana, Jaeger and Pyroscope show where the time goes. Each tier found a bug that the others could not. Smoke: pods restarted under load, because they inherited a tiny CPU request and the health check timed out. End to end: push messages were never sent when deployed, because the deployed boot path never started the WebSocket server; it worked locally and was found by running the real boot on a cluster. Performance: the commit was fast but the response was slow, which showed up only when the load tool's numbers were checked against the server logs. Other finds from the same runs: a 30-second smoke check before a long run stops an hour of bad numbers; events silently never arrived on a Redis cluster because a client option was missing; and the browser client listened on old channel names after a rename.</aside>
+</section>
+
+<section class="slide" data-title="Evidence" data-anim="evidence" data-view="codelark">
+  <div class="kicker h">Part 3 · Agents and evidence · <span class="tag" style="font-size:14px; letter-spacing:.06em">make it fast</span></div>
+  <h2 class="h">Evidence over opinion</h2>
+  <div class="p" style="left:960px; top:205px; width:560px; display:flex; flex-direction:column; gap:16px">
+    <div class="card a" style="padding:16px 22px">
+      <div class="small mono" style="margin-bottom:12px">load levels from production</div>
+      <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px 14px; align-items:center">
+        <span style="font-size:18px; color:var(--fg-2)">busiest minute<br><span class="small" style="font-size:13px">in 14 days</span></span><div style="display:flex; align-items:center; gap:10px"><div class="ebar" style="width:110px; height:20px; border-radius:4px; background:#94a3b8; transform-origin:left"></div><span class="mono" style="font-size:17px">20 writes/s</span></div>
+        <span style="font-size:18px; color:var(--fg-2)">high stress · 3×</span><div style="display:flex; align-items:center; gap:10px"><div class="ebar" style="width:330px; height:20px; border-radius:4px; background:#e3cf5a; transform-origin:left"></div><span class="mono" style="font-size:17px">60</span></div>
+      </div>
+    </div>
+    <div class="card a" style="padding:16px 22px">
+      <div class="small mono" style="margin-bottom:10px">tools agree · k6 = server logs = Grafana</div>
+      <div class="num" style="font-size:40px"><span data-count="2497">2,497</span> <span class="muted">=</span> <span data-count="2497">2,497</span> <span class="after" style="font-size:30px">✓</span></div>
+      <div class="num" style="font-size:40px; margin-top:10px"><span data-count="7404">7,404</span> <span class="muted">=</span> <span data-count="7404">7,404</span> <span class="after" style="font-size:30px">✓</span></div>
+    </div>
+    <div class="card a" style="padding:16px 22px">
+      <div class="small mono" style="margin-bottom:10px">honest write-ups</div>
+      <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start">
+        <span class="tag" style="font-size:17px">✓ what failed is stated</span>
+        <span class="tag" style="font-size:17px">✓ what was not measured is stated</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Claims about performance need numbers we can trace. The load levels came from production data: the busiest minute in 14 days of production data had about 19 line items a second, so the realistic level is 20 writes a second, and high stress is three times that. Then the tools must agree. Before trusting k6, I checked its counts against the server logs: 2,497 writes in k6 and 2,497 in the logs, and 7,404 against 7,404, and the Grafana panels matched k6. One tool alone is not trusted. And the write-ups say plainly what failed and what we did not measure, so nobody reads more into the results than they show. This is the code to Lark arrow: the evidence goes back into the published layer.</aside>
+</section>
+
+<section class="slide" data-title="Where it still breaks" data-anim="breaks" data-view="sessL">
+  <div class="kicker h">Part 3 · Agents and evidence</div>
+  <h2 class="h">Where it still breaks</h2>
+  <svg class="ov x" width="1600" height="900">
+    <g class="wbF" stroke="#e8743b" stroke-width="3" stroke-dasharray="6 6" fill="none">
+      <path d="M620 240 L800 246"/><path d="M640 256 L800 256"/><path d="M630 272 L800 266"/>
+      <path d="M1320 246 L1500 240"/><path d="M1320 256 L1480 256"/><path d="M1320 266 L1495 272"/>
+    </g>
+    <rect class="wbM" x="800" y="240" width="520" height="32" rx="6" fill="#5ab4e8"/>
+    <g class="wbL" stroke="#64748b" stroke-width="1.5" fill="none"><path d="M624 280 L624 362 L640 362"/><path d="M624 280 L624 470 L640 470"/><path d="M624 280 L624 578 L640 578"/><path d="M1498 280 L1498 362 L1484 362"/><path d="M1498 280 L1498 470 L1484 470"/><path d="M1498 280 L1498 578 L1484 578"/></g>
+  </svg>
+  <div class="p small mono wbM2" style="left:800px; top:282px; width:520px; text-align:center; white-space:nowrap; color:var(--fg-2)">the work itself: build · test · review</div>
+  <div class="p small mono wbM2" style="left:620px; top:202px; white-space:nowrap"><span class="before">≈</span> setting up: environment, tools</div>
+  <div class="p small mono wbM2" style="left:1100px; top:202px; width:400px; text-align:right; white-space:nowrap">handing off: publishing, bookkeeping <span class="before">≈</span></div>
+  <div class="p card wbC" style="left:640px; top:312px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">Started the local app on a port the login page rejects.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: the login bounced.</div></div>
+  <div class="p card wbC" style="left:640px; top:420px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">The load-test harness had bugs, so a day of numbers was misleading.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: a person questioned a 22 s result.</div></div>
+  <div class="p card wbC" style="left:640px; top:528px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">A log stream dropped and one run’s results were lost.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: a gap in the results.</div></div>
+  <div class="p card wbC" style="left:1074px; top:312px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">An edit landed on the wrong doc page.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: a person noticed.</div></div>
+  <div class="p card wbC" style="left:1074px; top:420px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">CI quietly skipped a whole stack of PRs.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: a person noticed.</div></div>
+  <div class="p card wbC" style="left:1074px; top:528px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">A replay was proven the same, but not right.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: the tests failed.</div></div>
+  <p class="p wbT" style="left:620px; top:664px; width:880px; font-size:23px; line-height:1.4; color:var(--fg)">The work in the middle is solid. The slips happen around it, and a person catches most of them.</p>
+  <aside class="notes">This slide is about where the work still goes wrong. Think of the work as a bar. The solid middle is the work itself: building, testing and reviewing, and agents are fast and thorough there. The frayed edges are where the work touches the outside world: setting up the environment and the tools at the start, and handing off at the end, which means publishing and bookkeeping. Six real slips, three at each edge. Setting up first. A local app started on a port that the login service refuses, and the login bounced. The load-test harness had bugs and gave misleading numbers for a day: a per-worker counter skewed the writes, fan-out to one client produced a fake 22-second median, and a cap on virtual users held the load down. Someone questioned that 22 seconds was too long, and the harness was fixed. And a load-test log stream dropped, so one run was lost, which showed as a gap in the results. Then handing off. A Lark doc edit landed on the wrong page, and a person noticed it. CI silently did not run for a whole stack, because of a dependency conflict lower down, until a person noticed. And a replay proved the change was the same but not that it was right: type errors in test files slipped past the patch checks and were caught by the tests. The work in the middle is solid. The slips happen around it, and a person catches most of them.</aside>
+</section>
+
+<section class="slide" data-title="Judgement" data-anim="judge" data-view="sessL">
+  <div class="kicker h">Part 3 · Agents and evidence</div>
+  <h2 class="h">Why people stay in the loop: judgement</h2>
+  <div class="p card jd" style="left:360px; top:192px; width:1160px; padding:12px 20px; border-color:var(--prod); display:flex; gap:14px; align-items:center"><span class="prod" style="font-size:22px">●</span><span style="font-size:19px"><b>A person designs the base;</b> agents polish and build.</span></div>
+  <div class="p small mono jh" style="left:360px; top:276px"><span class="warn">✦</span> a hunch → what it uncovered</div>
+  <div class="p card jq" style="left:360px; top:306px; width:360px; height:110px; padding:14px 18px; display:flex; gap:10px; align-items:center"><span class="warn" style="font-size:24px">✦</span><span style="font-size:18px; font-style:italic; color:var(--fg-2); line-height:1.35">“the improvement is significant. I’m a little suspicious”</span></div>
+  <div class="p jw" style="left:740px; top:324px; width:420px; height:74px; border-radius:12px; background:var(--after-soft); border:1.5px solid var(--after); display:flex; align-items:center; padding:0 18px; font-size:20px; color:var(--fg); transform-origin:left">after the harness fixes: k6 checked against server logs</div>
+  <div class="p jf" style="left:1180px; top:316px; width:340px; height:90px; display:flex; align-items:center; gap:10px; font-size:19px; line-height:1.35"><span class="after" style="font-size:22px">✓</span>the numbers held: 2,497 and 7,404 matched</div>
+  <div class="p jr" style="left:360px; top:420px; font-size:17px; color:var(--fg-2)"><span class="warn">Rule:</span> a result better than expected is a reason to check the tool, not to celebrate.</div>
+  <div class="p small mono jh" style="left:360px; top:456px"><span class="after">⌖</span> a technical call → what it shaped</div>
+  <div class="p card jq" style="left:360px; top:486px; width:360px; height:110px; padding:14px 18px; display:flex; gap:10px; align-items:center"><span class="after" style="font-size:24px">⌖</span><span style="font-size:18px;  color:var(--fg-2); line-height:1.35">“Services in one deploy need no network hop between them”</span></div>
+  <div class="p jw" style="left:740px; top:504px; width:420px; height:74px; border-radius:12px; background:var(--after-soft); border:1.5px solid var(--after); display:flex; align-items:center; padding:0 18px; font-size:20px; color:var(--fg); transform-origin:left">an in-process SDK</div>
+  <div class="p jf" style="left:1180px; top:496px; width:340px; height:90px; display:flex; align-items:center; gap:10px; font-size:19px; line-height:1.35"><span class="after" style="font-size:22px">✓</span>one entry point; layers held by lint</div>
+  <p class="p jt" style="left:360px; top:680px; font-size:24px; color:var(--fg)">Agents run the tools. Tools produce the evidence. People judge.</p>
+  <aside class="notes">The human part of this work is judgement. It starts with design: the data model, the API contract and the event design are drafted by a person first, and agents polish and build on that draft. Then hunches. Later, after the harness fixes, "the improvement is significant, I'm a little suspicious" led to cross-checking the k6 counts against the server logs: 2,497 and 7,404 matched, and the numbers held. The rule anyone can use: a result better than expected is a reason to check the tool, not to celebrate. Another hunch, "the slide is still buggy", found a layout bug that only shows at one screen size. Then technical calls that changed the shape of the system, which no tool made on its own. Services that ship in one deploy do not need a network hop between them, so the module exposes an in-process SDK with one entry point. One import direction, enforced by lint, including the rule that other modules only import the SDK entry. A missing scope must never mean everything, so the scope has an explicit "all" value, and a value that someone left out cannot widen a record. Measure where the code runs: the same spec on staging measured the real cost, which local tests could not. No golden fixture tests, because they drift silently; contract tests and real Postgres suites instead. Agents run the tools, the tools produce the evidence, and people judge. Choosing which question to ask, and noticing that something feels wrong before anything has failed, is still the human's job. It looks random, but it is experience pattern-matching on signals that are not written down anywhere.</aside>
+</section>
+
+<section class="slide" data-title="Monday list" data-anim="monday" data-view="home">
+  <div class="kicker h">Summary</div>
+  <h2 class="h">Try this on Monday</h2>
+  <div class="p card mc" data-node="lark" style="left:900px; top:212px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">1</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div style="font-size:25px; font-weight:600">Docs are the contract</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Docs say what should happen; running code says what does. Change both in the same PR.</div></div></div>
+  <div class="p card mc" data-node="lark" style="left:900px; top:362px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">2</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div><div><div style="font-size:25px; font-weight:600">Link, don’t name</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Every reference is a link. Long text lives in one place.</div></div></div>
+  <div class="p card mc" data-node="sessions" style="left:900px; top:512px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">3</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><rect x="10" y="3" width="4" height="18" rx="1"/><path d="M3 12h5M16 12h5M18 9l3 3-3 3"/></svg></div><div><div style="font-size:25px; font-weight:600">People judge</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Nothing goes outward without a person. Trust a number only after a second tool agrees.</div></div></div>
+  <div class="p mq" style="left:900px; top:680px; font-size:52px; font-weight:700">Questions?</div>
+  <aside class="notes">If you take three things into Monday, take these. One: docs are the contract. Docs say what should happen, and running code says what does. Change both in the same PR. Two: every reference is a link, and long text lives in one place. Three: people judge. Nothing goes outward without a person, and you trust a number only after a second tool agrees. Thank you. Questions? The last slide is an appendix: what you need to try this.</aside>
+</section>
+
+<section class="slide" data-title="Setup" data-anim="setup" data-view="setup">
+  <div class="kicker h">Appendix</div>
+  <h2 class="h">What you need to try this</h2>
+  <svg class="ov x" width="1600" height="900">
+    <path class="sa sul" d="M898 310 L880 310" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa sul" d="M640 248 L722 292" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa sul" d="M412 523 L429 523" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa sul" d="M330 626 C 420 626, 470 600, 500 560" data-c="#94a3b8" data-w="2"/>
+    <path class="sa sul" d="M1188 523 L1171 523" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa sul" d="M898 721 L880 721" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa sul" d="M690 668 C 720 640, 735 600, 740 561" data-c="#5ab4e8" data-w="2.5"/>
+  </svg>
+  <div class="lchip su" style="left:900px; top:272px"><span style="color:var(--after)">⌘</span> lark-cli · own auth</div>
+  <div class="lchip su" style="left:900px; top:314px"><span style="color:var(--after)">◇</span> lark skills · a Lark agent</div>
+  <div class="lchip su" style="left:470px; top:214px"><span style="color:var(--after)">◎</span> Jira · tracking</div>
+  <div class="lchip su" style="right:1188px; top:430px"><span style="color:var(--after)">⑂</span> gh · gh-stack</div>
+  <div class="lchip su" style="right:1188px; top:472px"><span style="color:var(--after)">⎇</span> git worktrees · one per PR</div>
+  <div class="lchip su" style="right:1188px; top:514px"><span style="color:var(--after)">✓</span> local SonarQube</div>
+  <div class="lchip su" style="right:1188px; top:556px"><span style="color:var(--after)">☸</span> kubectl · gcloud</div>
+  <div class="lchip su" style="left:96px; top:610px; border-color:#475569; color:var(--fg-2)"><span class="muted">≋</span> k6 · Grafana · Jaeger · Pyroscope</div>
+  <div class="lchip su" style="left:1190px; top:488px"><span style="color:var(--after)">◆</span> obsidian CLI</div>
+  <div class="lchip su" style="left:1190px; top:530px"><span style="color:var(--after)">◇</span> a vault agent</div>
+  <div class="lchip su" style="left:900px; top:704px"><span style="color:var(--after)">▤</span> file memory · index + one fact per file</div>
+  <div class="p card su" style="left:430px; top:648px; width:260px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:15px; color:var(--after)">▣ team skills pack</div><div style="font-size:13px; line-height:1.4; color:var(--fg-2); margin-top:6px">architecture overview · logs · databases · metrics · code quality</div></div>
+  <p class="p su" style="left:96px; top:790px; font-size:24px; color:var(--fg)">One adapter per layer, so a session can read and write it.</p>
+  <aside class="notes">Appendix: what you need to try this. This is the toolkit that connects each layer to a session. For Lark, lark-cli reads and writes docs and wikis with my own user-delegated login and no scope elevation, the lark skills tell a session how to use it, and a Lark agent does Lark work in the background. For Jira, the Atlassian MCP connector reads and writes tickets in markdown, and tracking uses Jira's own epics, links and status. For the code, gh with gh-stack manages stacked pull requests, each PR gets its own git worktree, local SonarQube scripts run the quality gate before a push, and kubectl and gcloud reach staging. The load-test harness sits beside the code: k6 locally and in the cloud, with Grafana, Jaeger and Pyroscope to read the results. For the vault, the Obsidian CLI reads and writes notes, and a vault agent helps record decisions when they matter and recall them before acting. Memory is the agent's file-based memory: an index with one fact per file. The team skills pack is shared and versioned. It teaches a session the company systems: an architecture overview, logs, databases, metrics and code quality. The rule across all of them: auth is always my own, and never elevated.</aside>
+</section>
+
+<div id="chrome"><span id="secLabel"></span><span id="counter"></span></div>
+</div></div>
+<div id="notes"><div class="h">SPEAKER NOTES</div><div id="notesText"></div></div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  let idx = 0;
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduce = mq.matches;
+  mq.addEventListener('change', e => { reduce = e.matches; });
+
+  const fit = () => { stage.style.transform = `translate(-50%, -50%) scale(${Math.min(innerWidth / 1600, innerHeight / 900)})`; };
+  addEventListener('resize', fit); fit();
+
+  const SKY = '#5ab4e8', SLATE = '#64748b', MUTED = '#94a3b8', BORDER = '#2a3754';
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+  // Every job a timer or timeline owns, so leaving a slide stops it.
+  let jobs = [];
+  const own = j => (jobs.push(j), j);
+  const stopJobs = () => { jobs.forEach(j => j.kill()); jobs = []; };
+
+  // Arrows draw through a mask, so dashed and solid lines reveal the same way, and the head rides the tip and grows with it.
+  let uid = 0;
+  function initSA(p) {
+    if (p._set) return p._set;
+    const svg = p.ownerSVGElement, len = p.getTotalLength(), c = p.dataset.c || MUTED, w = +(p.dataset.w || 3);
+    p.setAttribute('stroke', c); p.setAttribute('fill', 'none'); p.setAttribute('stroke-width', w);
+    if (p.dataset.dash) p.setAttribute('stroke-dasharray', p.dataset.dash);
+    const id = 'm' + (++uid);
+    const m = mk('mask', { id, maskUnits: 'userSpaceOnUse', x: -2000, y: -2000, width: 6000, height: 6000 });
+    const mp = mk('path', { d: p.getAttribute('d'), stroke: '#fff', 'stroke-width': w * 6 + 6, fill: 'none' }, m);
+    p.parentNode.insertBefore(m, p);
+    p.setAttribute('mask', `url(#${id})`);
+    const k = w / 3;
+    const h = mk('path', { d: `M${-14 * k},${-7.5 * k} L0,0 L${-14 * k},${7.5 * k} z`, fill: c });
+    p.after(h); p._head = h;
+    mp.style.strokeDasharray = len;
+    p._set = v => {
+      mp.style.strokeDashoffset = len * (1 - v);
+      const at = len * v, a = p.getPointAtLength(at), b = p.getPointAtLength(Math.max(0, at - 1.5));
+      const ang = Math.atan2(a.y - b.y, a.x - b.x) * 180 / Math.PI;
+      const s = Math.min(1, at / (22 * k));
+      h.setAttribute('transform', `translate(${a.x} ${a.y}) rotate(${ang}) scale(${s})`);
+    };
+    p._set(1);
+    return p._set;
+  }
+
+  // The layer map.
+  const NODES = {
+    lark: [800, 140, 'LARK', 'agreed · shared', '<path d="M0 0h18l8 8v28H0z"/><path d="M18 0v8h8M5 16h16M5 22h16M5 28h10"/>'],
+    code: [330, 470, 'CODE', 'built', '<path d="M9 8L0 18l9 10M21 8l9 10-9 10M18 4l-6 28"/>'],
+    vault: [1270, 470, 'VAULT', 'why', '<rect x="0" y="2" width="28" height="9" rx="2"/><path d="M2 11v22h24V11M10 18h8"/>'],
+    memory: [800, 790, 'MEMORY', 'how we work', '<circle cx="3" cy="6" r="2"/><circle cx="3" cy="17" r="2"/><circle cx="3" cy="28" r="2"/><path d="M10 6h18M10 17h18M10 28h12"/>'],
+    sessions: [800, 470, 'SESSIONS', 'scratch', '<rect x="0" y="2" width="30" height="30" rx="4"/><path d="M6 12l5 5-5 5M14 23h9"/>']
+  };
+  const NW = 250, NH = 110;
+  const SHARED = { lark: 1, code: 1 };
+  const ARROWS = [
+    ['a1', 'lark', 'sessions', 'M800 195 L800 415', 'a question', 814, 312, 'start'],
+    ['a2', 'sessions', 'code', 'M675 470 L455 470', 'investigate · fix', 565, 455, 'middle'],
+    ['a3', 'sessions', 'vault', 'M925 450 C1010 418 1060 418 1145 450', 'record why', 1035, 412, 'middle'],
+    ['a4', 'vault', 'sessions', 'M1145 492 C1060 524 1010 524 925 492', 'recall', 1035, 548, 'middle'],
+    ['a5', 'code', 'lark', 'M330 415 C330 230 470 140 675 140', 'update to match', 402, 196, 'end'],
+    ['a6', 'memory', 'sessions', 'M800 735 L800 525', 'how we work', 814, 636, 'start'],
+    ['a0', 'person', 'lark', 'M604 40 C 660 40, 700 55, 730 83', 'drafts the base design', 556, 30, 'end'],
+    ['a7', 'lark', 'lark', 'M860 85 C 880 22, 965 30, 927 118', 'agent polishes', 958, 40, 'start', '5 6']
+  ];
+  const mapg = document.getElementById('mapg');
+  const A = {}, N = {};
+  ARROWS.forEach(([id, , , d, label, lx, ly, anchor, dash]) => {
+    const g = mk('g', {}, mapg);
+    const p = mk('path', { d }, g); p.dataset.c = MUTED; p.dataset.w = 2.5; if (dash) p.dataset.dash = dash;
+    initSA(p);
+    const t = mk('text', { x: lx, y: ly, fill: MUTED, 'font-family': 'JetBrains Mono', 'font-size': 18, 'text-anchor': anchor }, g); t.textContent = label;
+    A[id] = { g, p, t };
+  });
+  Object.entries(NODES).forEach(([k, [cx, cy, title, sub, icon]]) => {
+    const outer = mk('g', { transform: `translate(${cx - NW / 2} ${cy - NH / 2})` }, mapg);
+    const inner = mk('g', {}, outer);
+    const box = mk('rect', { width: NW, height: NH, rx: 14, fill: '#141e33', stroke: BORDER, 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke' }, inner);
+    const ring = mk('rect', { x: -8, y: -8, width: NW + 16, height: NH + 16, rx: 20, fill: 'none', stroke: SKY, 'stroke-width': 3, opacity: 0, 'vector-effect': 'non-scaling-stroke' }, inner);
+    const lab = mk('g', {}, inner);
+    const ic = mk('g', { transform: 'translate(24 37)', fill: 'none', stroke: '#cbd5e1', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, lab); ic.innerHTML = icon;
+    const tt = mk('text', { x: 74, y: 52, fill: '#f1f5f9', 'font-family': 'JetBrains Mono', 'font-size': 24, 'font-weight': 700, 'letter-spacing': 2 }, lab); tt.textContent = title;
+    const ts = mk('text', { x: 74, y: 80, fill: MUTED, 'font-family': 'IBM Plex Sans', 'font-size': 18 }, lab); ts.textContent = sub;
+    const bd = mk('g', { transform: `translate(${NW - 12} 22)`, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.4, 'stroke-linecap': 'round' }, lab);
+    const sh = SHARED[k];
+    const bt = mk('text', { x: -20, y: 0, fill: '#94a3b8', stroke: 'none', 'font-family': 'JetBrains Mono', 'font-size': 13, 'text-anchor': 'end' }, bd);
+    bt.textContent = sh ? 'shared' : (k === 'sessions' ? 'local · temp' : 'local');
+    if (sh) bd.insertAdjacentHTML('beforeend', '<circle cx="-8" cy="-5" r="6"/><ellipse cx="-8" cy="-5" rx="2.6" ry="6"/><path d="M-14 -5h12"/>');
+    else bd.insertAdjacentHTML('beforeend', '<rect x="-13" y="-10" width="10" height="7" rx="1"/><path d="M-15 -1h14"/>');
+    N[k] = { outer, inner, box, ring, lab, bd, tt };
+  });
+  const PERSON = mk('g', { transform: 'translate(580 40)' }, mapg);
+  mk('circle', { cx: 0, cy: -12, r: 11, fill: 'none', stroke: '#cc79a7', 'stroke-width': 2.5 }, PERSON);
+  mk('path', { d: 'M-18 18 C -16 2, 16 2, 18 18', fill: 'none', stroke: '#cc79a7', 'stroke-width': 2.5 }, PERSON);
+  mk('text', { x: 0, y: 44, fill: '#f1f5f9', 'font-family': 'IBM Plex Sans', 'font-size': 18, 'text-anchor': 'middle' }, PERSON).textContent = 'a person';
+  const pulses = [0, 1].map(() => mk('circle', { r: 8, fill: SKY, opacity: 0, style: 'filter: drop-shadow(0 0 6px rgba(90,180,232,.9))' }, mapg));
+
+  // Views: centre c (map units) lands on screen point p at scale s.
+  const ALL = Object.keys(NODES);
+  const VIEWS = {
+    title:    { c: [800, 465], s: .62, p: [1130, 500], lit: ALL },
+    home:     { c: [800, 465], s: .6,  p: [480, 525],  lit: ALL, person: .5 },
+    loop:     { c: [800, 465], s: .65, p: [496, 520],  lit: ALL, person: 1 },
+    lark:     { c: [800, 140], s: 2.1, p: [420, 520],  lit: ['lark'] },
+    larkcode: { c: [565, 305], s: .7, p: [352, 470], lit: ['code', 'lark'], mute: ['a5'], adim: 0, ndim: 0, rename: { lark: 'TEAM DOCS' } },
+    larkIn:   { c: [800, 140], s: 5.2, p: [800, 518],  lit: ['lark'], hide: ['lark'], adim: 0, nofocus: true },
+    vault:    { c: [1270, 470], s: 2,  p: [360, 480],  lit: ['vault'] },
+    memsess:  { c: [800, 630], s: 1.25, p: [330, 520], lit: ['memory', 'sessions'], hi: ['a6'], scrim: 800, ndim: .08, adim: .06 },
+    code:     { c: [330, 470], s: .85, p: [202, 560],  lit: ['code'], scrim: 330, adim: .07, ndim: .1 },
+    layers:   { c: [800, 465], s: .78, p: [800, 530], lit: ALL, person: .5, badges: 1 },
+    setup:    { c: [800, 465], s: .62, p: [800, 520], lit: ALL },
+    links:    { c: [800, 465], s: .72, p: [560, 520], lit: ALL },
+    sessL:    { c: [800, 470], s: .85, p: [202, 560], lit: ['sessions'], scrim: 330, adim: .04, ndim: 0 },
+    sess:     { c: [800, 470], s: 1.6, p: [300, 470],  lit: ['sessions'], scrim: 560, adim: .06, ndim: .1 },
+    codelark: { c: [500, 280], s: 1.1, p: [430, 470], lit: ['code', 'lark'], hi: ['a5'], scrim: 930, adim: .1, ndim: .15 }
+  };
+  const Z = { x: 0, y: 0, s: 1 };
+  const renderZ = () => mapg.setAttribute('transform', `translate(${Z.x} ${Z.y}) scale(${Z.s})`);
+  const scrim = document.getElementById('scrim');
+  const arrowColor = (id, c, d, t, at) => {
+    const tw = [[A[id].p, { attr: { stroke: c } }], [A[id].p._head, { attr: { fill: c } }], [A[id].t, { attr: { fill: c === SKY ? '#cbd5e1' : MUTED } }]];
+    tw.forEach(([el, v]) => t ? t.to(el, { ...v, duration: d }, at) : gsap.to(el, { ...v, duration: d }));
+  };
+  function applyView(name, first) {
+    const V = VIEWS[name], d = (first || reduce) ? 0 : .85;
+    const all = V.lit.length === ALL.length;
+    gsap.to(Z, { x: V.p[0] - V.c[0] * V.s, y: V.p[1] - V.c[1] * V.s, s: V.s, duration: d, ease: 'power3.out', onUpdate: renderZ, overwrite: true });
+    if (!d) renderZ();
+    for (const k of ALL) {
+      const lit = V.lit.includes(k);
+      const sx = V.p[0] + (NODES[k][0] - V.c[0]) * V.s;
+      gsap.to(N[k].outer, { opacity: lit ? 1 : (V.scrim && sx > V.scrim ? 0 : (V.ndim ?? .25)), duration: d * .8, overwrite: true });
+      gsap.to(N[k].box, { attr: { stroke: lit && !all && !V.nofocus ? SKY : BORDER }, duration: d * .8 });
+      gsap.to(N[k].lab, { opacity: (V.hide || []).includes(k) ? 0 : 1, duration: d * .6 });
+      gsap.set(N[k].inner, { opacity: 1, scale: 1 });
+      gsap.set(N[k].ring, { opacity: 0 });
+      gsap.to(N[k].bd, { opacity: V.badges ?? .4, duration: d * .6 });
+      N[k].tt.textContent = (V.rename || {})[k] || NODES[k][2];
+    }
+    gsap.to(PERSON, { opacity: V.person ?? 0, duration: d * .8, overwrite: true });
+    for (const [id, from, to] of ARROWS) {
+      const hi = (V.hi || []).includes(id);
+      if (id === 'a0' || id === 'a7') { gsap.to(A[id].g, { opacity: V.person ?? 0, duration: d * .8, overwrite: true }); arrowColor(id, MUTED, 0); A[id].p._set(1); gsap.set(A[id].t, { opacity: 1 }); continue; }
+      const on = hi || all || (V.mute || []).includes(id);
+      const op = on ? 1 : (V.adim ?? (V.lit.includes(from) || V.lit.includes(to) ? .3 : .15));
+      gsap.to(A[id].g, { opacity: op, duration: d * .8, overwrite: true });
+      arrowColor(id, hi ? SKY : MUTED, d * .8);
+      A[id].p._set(1); gsap.to(A[id].t, { opacity: !all && !hi ? 0 : 1, duration: d * .5 });
+    }
+    pulses.forEach(c => gsap.set(c, { opacity: 0 }));
+    gsap.to(scrim, { opacity: V.scrim ? 1 : 0, left: (V.scrim || 1600) + 'px', duration: d, ease: 'power3.out' });
+  }
+
+  // Timelines: panel content waits for the zoom to settle; reduced motion jumps to the end state.
+  const T = (delay = .6) => own(gsap.timeline({ delay: reduce ? 0 : delay }));
+  const fin = t => { if (reduce) t.progress(1); return t; };
+  const IN = { opacity: 0, y: 16 }, OUT = { opacity: 1, y: 0, duration: .5, ease: 'power2.out' };
+  const hdr = el => own(gsap.fromTo(el.querySelectorAll('.h'), { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: reduce ? 0 : .5, stagger: reduce ? 0 : .08, ease: 'power2.out', delay: reduce ? 0 : .1 }));
+  const items = (t, list, at = 0, st = .1) => t.fromTo(list, IN, { ...OUT, stagger: st }, at);
+  const fade = (t, list, at, dur = .5) => t.fromTo(list, { opacity: 0 }, { opacity: 1, duration: dur, ease: 'power2.out' }, at);
+  const drawSA = (t, p, at, dur = .7) => { const set = initSA(p), o = { v: 0 }; set(0); t.to(o, { v: 1, duration: dur, ease: 'power2.inOut', onUpdate: () => set(o.v) }, at); };
+  const ring = (t, k, at) => { t.fromTo(N[k].ring, { opacity: 0 }, { opacity: 1, duration: .25 }, at).to(N[k].ring, { opacity: 0, duration: .7 }, at + 1.1); };
+  const pulse = (t, c, id, at, dur = .8) => {
+    const p = A[id].p, len = p.getTotalLength(), o = { v: 0 };
+    t.set(c, { opacity: 1 }, at);
+    t.to(o, { v: 1, duration: dur, ease: 'power1.inOut', onUpdate: () => { const q = p.getPointAtLength(len * o.v); c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); } }, at);
+    t.set(c, { opacity: 0 }, at + dur);
+  };
+  const generic = el => { const t = T(); items(t, el.querySelectorAll('.a')); fin(t); };
+
+  const builders = {
+    title: () => {
+      const t = T(.25);
+      for (const k of ALL) gsap.set(N[k].inner, { opacity: 0, scale: .85, transformOrigin: '50% 50%' });
+      t.to(ALL.map(k => N[k].inner), { opacity: 1, scale: 1, duration: .6, stagger: .14, ease: 'power3.out' }, 0);
+      ARROWS.forEach(([id], i) => {
+        const o = { v: 0 }, a = A[id]; a.p._set(0); gsap.set(a.t, { opacity: 0 });
+        t.to(o, { v: 1, duration: .8, ease: 'power2.inOut', onUpdate: () => a.p._set(o.v) }, .9 + i * .2);
+        t.to(a.t, { opacity: 1, duration: .4 }, 1.6 + i * .2);
+      });
+      fin(t);
+    },
+    layers: el => {
+      const t = T(), rows = [...el.querySelectorAll('.a')];
+      items(t, rows, 0, .45);
+      rows.forEach((r, i) => {
+        const pips = [...r.querySelectorAll('.pips i')].slice(0, +(r.querySelector('.pips') || { dataset: { n: 0 } }).dataset.n);
+        pips.forEach(p => p.classList.remove('f'));
+        pips.forEach((p, j) => t.call(() => p.classList.add('f'), null, .25 + i * .45 + j * .06));
+        if (r.dataset.node) ring(t, r.dataset.node, .1 + i * .45);
+      });
+      fin(t);
+    },
+    consist: el => {
+      const t = T(.7);
+      items(t, el.querySelectorAll('.dc'), 0, .12);
+      t.fromTo(el.querySelectorAll('.lh'), { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: .45, stagger: .1, ease: 'power2.out' }, .6);
+      t.fromTo(el.querySelectorAll('.eh'), { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .35, stagger: .1, ease: 'power2.out' }, .85);
+      fade(t, '#depCode', 1.2);
+      t.fromTo(el.querySelectorAll('.lv'), { scaleY: 0, transformOrigin: 'center top' }, { scaleY: 1, duration: .45, stagger: .08, ease: 'power2.out' }, 1.45);
+      t.fromTo(el.querySelectorAll('.ev'), { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .35, stagger: .08, ease: 'power2.out' }, 1.7);
+      const lh0 = el.querySelector('.lh'), eh0 = el.querySelector('.eh');
+      t.to([lh0, eh0], { opacity: 0, duration: .4 }, 2.7);
+      t.fromTo(['#driftLine', '#driftEq'], { opacity: 0 }, { opacity: 1, duration: .5 }, 2.75);
+      items(t, '#driftCall', 3.2);
+      items(t, '#consistPoint', 4.1);
+      items(t, '#consistSub', 4.7);
+      fin(t);
+    },
+    loop: el => {
+      const t = T(.9);
+      const seq = [['a0', 0], ['a7', .55], ['a1', 1.1], ['a2', 1.65], ['a3', 1.65], ['a5', 2.2]];
+      seq.forEach(([id, at], i) => { pulse(t, pulses[id === 'a3' ? 1 : 0], id, at, .55); if (id !== 'a0' && id !== 'a7') arrowColor(id, SKY, .3, t, at + .5); });
+      const steps = [...el.querySelectorAll('.st')], heads = [...el.querySelectorAll('.sth')];
+      fade(t, heads[0], 2.9, .4); fade(t, heads[1], 2.9 + 3 * .4 + .1, .4);
+      steps.forEach((s, i) => {
+        const at = 3.0 + i * .4 + (i > 2 ? .2 : 0);
+        t.fromTo(s, IN, OUT, at);
+        ring(t, s.dataset.node, at);
+        t.to(s.querySelector('.n'), { borderColor: SKY, color: SKY, duration: .3 }, at);
+      });
+      fin(t);
+      if (!reduce) {
+        const r = own(gsap.timeline({ repeat: -1, repeatDelay: 1.6, delay: .9 + 3.0 + steps.length * .4 + 1 }));
+        seq.forEach(([id, at]) => pulse(r, pulses[id === 'a3' ? 1 : 0], id, at, .8));
+      }
+    },
+    ondemand: el => {
+      const t = T(), rows = [...el.querySelectorAll('.a')], svg = el.querySelector('#fanSvg');
+      svg.replaceChildren();
+      items(t, rows, 0, .55);
+      [...el.querySelectorAll('.load')].forEach((r, i) => {
+        const y = 205 + r.offsetTop + 16;
+        const p = mk('path', { class: 'sa', d: `M842 ${y} C 700 ${y}, 620 ${300 + i * 10}, 492 ${300 + i * 10}`, 'data-c': '#5ab4e8', 'data-w': 2 }, svg);
+        drawSA(t, p, .15 + i * .55, .5);
+      });
+      ring(t, 'sessions', 0);
+      pulse(t, pulses[0], 'a6', 1.0); ring(t, 'memory', 1.1);
+      fin(t);
+    },
+    setup: el => {
+      const t = T(), groups = [[['lark'], [0, 1, 2]], [['code'], [3, 4, 5, 6, 7]], [['vault'], [8, 9]], [['memory'], [10]], [['sessions'], [11]]];
+      const su = [...el.querySelectorAll('.su')], ln = [...el.querySelectorAll('.sul')];
+      const lineOf = [0, 0, 1, 2, 2, 2, 2, 3, 4, 4, 5, 6];
+      groups.forEach(([[k], ids], g) => {
+        const at = g * .8;
+        ring(t, k, at);
+        t.fromTo(ids.map(i => su[i]), { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: .4, stagger: .1, ease: 'power2.out' }, at + .1);
+        [...new Set(ids.map(i => lineOf[i]))].forEach(j => drawSA(t, ln[j], at + .3, .4));
+      });
+      items(t, su[12], 4.3);
+      fin(t);
+    },
+    loops: el => {
+      const t = T();
+      fade(t, el.querySelectorAll('.tlg'), 0, .4);
+      [...el.querySelectorAll('.tlr')].forEach((r, i) => t.fromTo(r, IN, OUT, .3 + i * .55));
+      t.fromTo(el.querySelectorAll('.tlb'), { scaleX: 0 }, { scaleX: 1, duration: .7, stagger: .3, ease: 'power2.out' }, .45);
+      items(t, el.querySelectorAll('.tll'), 2.8);
+      items(t, el.querySelectorAll('.tlp'), 3.4);
+      fade(t, el.querySelectorAll('.tlk'), 3.9);
+      fin(t);
+      if (!reduce) own(gsap.to(el.querySelectorAll('.cyc'), { rotation: 360, transformOrigin: '50% 50%', duration: 4, repeat: -1, ease: 'none', delay: 3 }));
+    },
+    whylark: el => {
+      const t = T(), ls = el.querySelectorAll('.wal'), cs = el.querySelectorAll('.wac');
+      cs.forEach((c, i) => { drawSA(t, ls[i], i * .55, .5); t.fromTo(c, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: .4, ease: 'power2.out' }, i * .55 + .35); });
+      t.fromTo(el.querySelector('.wast'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 2.8);
+      fin(t);
+    },
+    hook: el => {
+      const t = T();
+      fade(t, el.querySelectorAll('.hk0'), 0, .3);
+      t.fromTo(el.querySelectorAll('.hk1'), IN, { ...OUT, stagger: .2 }, 0);
+      el.querySelectorAll('.hl1').forEach((p, i) => drawSA(t, p, .5 + i * .1, .5));
+      fade(t, el.querySelectorAll('.hk2'), .7, .3);
+      t.fromTo(el.querySelectorAll('.hka'), { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .4, ease: 'power2.out' }, .7);
+      drawSA(t, el.querySelector('.hl2'), 1.2, .4);
+      t.fromTo(el.querySelector('.hkr'), { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: .45, ease: 'power2.out' }, 1.5);
+      items(t, el.querySelectorAll('.hkl'), 2.4);
+      drawSA(t, el.querySelector('.hl3'), 2.8, .6);
+      fade(t, el.querySelectorAll('.hkx'), 3.3, .3);
+      items(t, el.querySelectorAll('.hkq'), 4.0, .6);
+      fin(t);
+    },
+    larkc: el => {
+      const t = T(), q = s => el.querySelectorAll(s);
+      fade(t, q('.lkNe'), .2, .4);
+      fade(t, q('.lkCap'), .5, .4);
+      q('.lkV path.sa').forEach((p, i) => drawSA(t, p, 1.3 + i * .35, .4));
+      items(t, q('.lkVb'), 1.5, .35);
+      q('.lkS path.sa').forEach((p, i) => drawSA(t, p, 2.8 + (i > 1 ? 1 : i) * .35, .4));
+      items(t, q('.lkSb'), 3.0, .18);
+      items(t, q('.lkC'), 4.5, .15);
+      items(t, q('.lkStrip'), 5.8);
+      items(t, q('.wast'), 6.3);
+      fin(t);
+    },
+    loops2: el => {
+      const t = T();
+      items(t, el.querySelectorAll('.lq'), 0);
+      fade(t, el.querySelectorAll('.lqk'), .5);
+      t.fromTo(el.querySelectorAll('.ph'), IN, { ...OUT, stagger: .35 }, 1.0);
+      fade(t, el.querySelectorAll('.pha'), 1.4, .3);
+      items(t, el.querySelectorAll('.tll'), 2.6);
+      items(t, el.querySelectorAll('.tlp'), 3.1);
+      fade(t, el.querySelectorAll('.tlx'), 3.6);
+      fin(t);
+      if (!reduce) own(gsap.to(el.querySelectorAll('.cyc'), { rotation: 360, transformOrigin: '50% 50%', duration: 4, repeat: -1, ease: 'none', delay: 2.5 }));
+    },
+    linrb: el => {
+      const t = T();
+      fade(t, '#lrA', 0, .4); fade(t, el.querySelectorAll('.lr1')[0], .2, .3);
+      fade(t, '#lrB', .5, .4); fade(t, el.querySelectorAll('.lr1')[1], .7, .3);
+      const X = el.querySelector('#lrX'), L = X.getTotalLength();
+      t.fromTo(X, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: .5, ease: 'power2.out' }, .9);
+      items(t, el.querySelectorAll('.lr2'), 1.4);
+      items(t, el.querySelectorAll('.lr3'), 1.8);
+      fade(t, el.querySelectorAll('.lr4'), 2.2, .3);
+      t.fromTo(el.querySelectorAll('.lrc'), { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: .4, stagger: .45, ease: 'power2.out' }, 2.4);
+      items(t, el.querySelectorAll('.lrw'), 3.9);
+      items(t, el.querySelectorAll('.lrp'), 4.4);
+      fin(t);
+    },
+    monday: el => {
+      const t = T(), cs = [...el.querySelectorAll('.mc')];
+      cs.forEach((c, i) => { t.fromTo(c, { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: .5, ease: 'power2.out' }, i * .7); ring(t, c.dataset.node, i * .7); });
+      items(t, el.querySelectorAll('.mq'), 2.4);
+      fin(t);
+    },
+    running: el => {
+      const t = T();
+      t.fromTo(el.querySelectorAll('.qf'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .4, stagger: .4, ease: 'power2.out' }, 0);
+      t.fromTo(el.querySelectorAll('.qfa'), { opacity: 0 }, { opacity: 1, duration: .3, stagger: .4 }, .25);
+      const rows = [...el.querySelectorAll('.qr')];
+      [0, 1, 2, 3].forEach(i => t.fromTo(rows.slice(i * 2, i * 2 + 2), { opacity: 0 }, { opacity: 1, duration: .3 }, 1.8 + i * .4));
+      t.fromTo(el.querySelectorAll('.qt'), { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: .4, stagger: .2, ease: 'power2.out' }, 1.9);
+      t.fromTo(el.querySelectorAll('.qb'), { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: .4, stagger: .25, ease: 'power2.out' }, 2.6);
+      fin(t);
+    },
+    links: el => {
+      const t = T();
+      t.fromTo(el.querySelectorAll('.lc'), { opacity: 0, scale: .8 }, { opacity: 1, scale: 1, duration: .4, stagger: .15, ease: 'power2.out' }, 0);
+      el.querySelectorAll('.lkl').forEach((p, i) => drawSA(t, p, .7 + i * .35, .6));
+      items(t, el.querySelectorAll('.a'), 2.4, .5);
+      fin(t);
+    },
+    once: el => {
+      const t = T();
+      items(t, el.querySelectorAll('.a'), 0, .25);
+      t.fromTo(el.querySelectorAll('.bars i.d'), { opacity: 0 }, { opacity: 1, duration: .4, stagger: .2 }, 1.0);
+      t.fromTo(el.querySelectorAll('.ch'), IN, { ...OUT, stagger: .25 }, 1.9);
+      el.querySelectorAll('.onl').forEach((p, i) => drawSA(t, p, 2.1 + i * .25, .6));
+      ring(t, 'lark', 2.6);
+      fin(t);
+    },
+    shape: el => {
+      const t = T();
+      fade(t, el.querySelectorAll('.shc'), 0);
+      items(t, el.querySelectorAll('.shb'), 0, .1);
+      fade(t, el.querySelectorAll('.shg'), .7, .4);
+      items(t, el.querySelectorAll('.sho'), 1.1);
+      drawSA(t, el.querySelector('#shOk'), 1.5, .5);
+      drawSA(t, el.querySelector('#shBad'), 2.0, .5);
+      t.fromTo(el.querySelector('.shx'), { opacity: 0, scale: .5 }, { opacity: 1, scale: 1, duration: .35, ease: 'power2.out' }, 2.5);
+      items(t, el.querySelectorAll('.shl'), 2.8);
+      items(t, el.querySelectorAll('.shr > div'), 3.3, .3);
+      items(t, el.querySelectorAll('.shp'), 4.4);
+      fin(t);
+    },
+    refactor: el => {
+      const t = T(), rows = [...el.querySelectorAll('.case')];
+      items(t, rows[0], 0);
+      rows.slice(1).forEach((r, i) => {
+        const cs = r.children, at = .3 + i * 1.0;
+        t.fromTo(cs[0], IN, OUT, at);
+        t.fromTo([cs[1], cs[2]], { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: .45, ease: 'power2.out' }, at + .3);
+        t.fromTo([cs[3], cs[4]], { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: .45, ease: 'power2.out' }, at + .6);
+      });
+      items(t, [...el.querySelectorAll('p.a')], 4.5, .4);
+      fin(t);
+    },
+    stack: el => {
+      const t = T(), boxes = [...el.querySelectorAll('.sb')];
+      items(t, boxes, 0, .2);
+      el.querySelectorAll('.sk').forEach((p, i) => drawSA(t, p, .25 + i * .2, .35));
+      items(t, el.querySelectorAll('.sb2'), 1.3, .15);
+      el.querySelectorAll('.sk2').forEach((p, i) => drawSA(t, p, 1.5 + i * .15, .4));
+      t.fromTo('#fixDot', { opacity: 0, scale: .4, y: 0 }, { opacity: 1, scale: 1, duration: .4, ease: 'power2.out' }, 2.3);
+      fade(t, '#fixLbl', 2.4);
+      t.to('#pr5187', { borderColor: SKY, duration: .3 }, 2.4);
+      items(t, '#cfl', 3.2);
+      t.to('#fixLbl', { x: -46, y: -45, fontSize: 15, color: '#cbd5e1', duration: .8, ease: 'power2.inOut' }, 3.8);
+      t.to('#fixDot', { y: -90, duration: .8, ease: 'power2.inOut' }, 3.8);
+      t.to('#pr5216', { borderColor: SKY, duration: .3 }, 4.5);
+      items(t, '#nocfl', 5.0);
+      items(t, '#stackCap', 5.8);
+      fin(t);
+    },
+    linear: el => {
+      const t = T();
+      const fx = el.querySelector('#fixC'), cB = el.querySelector('#cB');
+      fade(t, el.querySelectorAll('.la'), 0); fade(t, '#linA', .1);
+      t.fromTo(fx, { opacity: 0, attr: { transform: 'translate(930 330)' } }, { opacity: 1, duration: .4 }, .7);
+      const o = { v: 0 };
+      t.to(o, { v: 1, duration: 1.1, ease: 'power2.inOut', onUpdate: () => { const x = 930 - 370 * o.v, y = 330 - Math.sin(Math.PI * o.v) * 70; fx.setAttribute('transform', `translate(${x} ${y}) scale(${1 - .5 * o.v})`); } }, 1.3);
+      t.to(fx, { opacity: 0, duration: .25 }, 2.3);
+      t.fromTo(cB, { attr: { r: 13 } }, { attr: { r: 18 }, duration: .25, yoyo: true, repeat: 1 }, 2.3);
+      items(t, el.querySelectorAll('.la2'), 2.6);
+      fade(t, el.querySelectorAll('.lb'), 3.0); fade(t, '#linB', 3.1);
+      const cr = el.querySelector('#crossB'), L = cr.getTotalLength();
+      t.fromTo(cr, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: .6, ease: 'power2.out' }, 3.7);
+      fade(t, el.querySelectorAll('.lc'), 4.4); fade(t, '#linC', 4.5);
+      t.fromTo('#snapC', { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: .5 }, 5.0);
+      items(t, el.querySelectorAll('.lc2'), 5.6);
+      fin(t);
+    },
+    rebase: el => {
+      const t = T();
+      items(t, el.querySelectorAll('.rb0 > div:first-child'), 0);
+      t.fromTo(el.querySelectorAll('.rbB'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3, stagger: .12 }, .2);
+      const E = el.querySelectorAll('.rbE');
+      t.fromTo(E[0], { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: 'power2.out' }, 1.0);
+      items(t, el.querySelectorAll('.rb1 > div:first-child'), 2.0);
+      t.fromTo(el.querySelectorAll('.rbA'), { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: .3, stagger: .15, ease: 'power2.out' }, 2.2);
+      t.fromTo(E[1], { scaleX: 0 }, { scaleX: 1, duration: .5, ease: 'power2.out' }, 3.2);
+      t.fromTo(el.querySelectorAll('.rb0 .small, .rb1 .small'), { opacity: 0 }, { opacity: 1, duration: .3 }, 1.0);
+      t.fromTo(el.querySelectorAll('.rbP .tag'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .35, stagger: .2 }, 3.7);
+      items(t, el.querySelectorAll('.rbN'), 4.5);
+      items(t, el.querySelectorAll('.rbT'), 5.0);
+      fin(t);
+    },
+    push: el => {
+      const t = T(), st = [...el.querySelectorAll('.pstep')];
+      st.forEach(s => s.classList.remove('lit'));
+      items(t, st, 0, .08);
+      t.fromTo('#plineFill', { scaleY: 0 }, { scaleY: 1, duration: st.length * .6, ease: 'none' }, .8);
+      st.forEach((s, i) => {
+        t.call(() => s.classList.add('lit'), null, .8 + i * .6);
+        t.fromTo(s.querySelector('.ok'), { opacity: 0 }, { opacity: 1, duration: .3 }, 1.0 + i * .6);
+      });
+      items(t, '#oneAt', .8 + st.length * .6 + .3);
+      items(t, '#pushFoot', .8 + st.length * .6 + .9);
+      fin(t);
+    },
+    staging: generic,
+    agents: el => {
+      const t = T(), dots = [...el.querySelectorAll('.agd')], chips = [...el.querySelectorAll('.agc')], gate = el.querySelector('#gate');
+      fade(t, el.querySelectorAll('.agl'), 0, .4);
+      fade(t, el.querySelectorAll('#agSvg line'), 0, .4);
+      fade(t, [gate, ...el.querySelectorAll('.agg')], .3);
+      fade(t, el.querySelectorAll('.ago'), .5);
+      items(t, el.querySelectorAll('.agt'), .8);
+      gsap.set(dots, { opacity: 0, attr: { cx: 800 } });
+      fin(t);
+      const on = c => { c.classList.add('after'); c.textContent = '✓ ' + c.dataset.t; }, off = c => { c.classList.remove('after'); c.textContent = c.dataset.t; };
+      chips.forEach(c => { c.dataset.t = c.dataset.t || c.textContent; });
+      const lit = () => { gsap.set(dots, { opacity: 1, attr: { cx: 1150 } }); gsap.set(gate, { attr: { fill: SKY, stroke: SKY } }); chips.forEach(on); };
+      chips.forEach(off);
+      gsap.set(gate, { attr: { fill: '#1a2540', stroke: MUTED } });
+      if (reduce) { lit(); return; }
+      const r = own(gsap.timeline({ repeat: -1, delay: 1.4 }));
+      const speeds = [1.4, 2.0, 1.1, 1.7];
+      dots.forEach((d, i) => r.fromTo(d, { opacity: 1, attr: { cx: 800 } }, { attr: { cx: 1150 }, duration: speeds[i], ease: 'power1.inOut' }, i * .15));
+      r.to(gate, { attr: { fill: SKY, stroke: SKY }, duration: .3 }, 2.6);
+      r.call(() => chips.forEach(on), null, 2.7);
+      r.to(dots, { opacity: 0, duration: .4 }, 3.2);
+      r.to(gate, { attr: { fill: '#1a2540', stroke: MUTED }, duration: .4 }, 4.4);
+      r.call(() => chips.forEach(off), null, 4.4);
+      r.to({}, { duration: .6 }, 4.6);
+    },
+    breaks: el => {
+      const t = T();
+      t.fromTo(el.querySelector('.wbM'), { scaleX: 0, transformOrigin: '50% 50%' }, { scaleX: 1, duration: .7, ease: 'power2.out' }, 0);
+      fade(t, el.querySelectorAll('.wbM2'), .5);
+      t.fromTo(el.querySelectorAll('.wbF path'), { opacity: 0 }, { opacity: 1, duration: .3, stagger: .08 }, .8);
+      el.querySelectorAll('.wbC').forEach((c, i) => {
+        t.fromTo(c, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .4, ease: 'power2.out' }, 1.4 + i * .45);
+        t.fromTo(el.querySelectorAll('.wbL path')[i], { opacity: 0 }, { opacity: 1, duration: .3 }, 1.6 + i * .45);
+      });
+      items(t, el.querySelectorAll('.wbT'), 4.4);
+      fin(t);
+    },
+    judge: el => {
+      const t = T();
+      items(t, el.querySelectorAll('.jd'), 0);
+      const hs = el.querySelectorAll('.jh'), qs = el.querySelectorAll('.jq'), ws = el.querySelectorAll('.jw'), fs = el.querySelectorAll('.jf');
+      [0, 1].forEach(i => {
+        const at = .6 + i * 1.6;
+        fade(t, hs[i], at, .3);
+        t.fromTo(qs[i], { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, duration: .4, ease: 'power2.out' }, at + .1);
+        t.fromTo(ws[i], { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: .6, ease: 'power2.out' }, at + .5);
+        t.fromTo(fs[i], { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: .4 }, at + 1.0);
+      });
+      items(t, el.querySelectorAll('.jt'), 4.0);
+      fin(t);
+    },
+    evidence: el => {
+      const t = T();
+      items(t, el.querySelectorAll('.a'), 0, .5);
+      t.fromTo(el.querySelectorAll('.ebar'), { scaleX: 0 }, { scaleX: 1, duration: .9, stagger: .25, ease: 'power3.out' }, .3);
+      el.querySelectorAll('[data-count]').forEach(n => {
+        const to = +n.dataset.count, o = { v: 0 };
+        t.to(o, { v: to, duration: 1.2, ease: 'power2.out', onUpdate: () => { n.textContent = Math.round(o.v).toLocaleString('en-US'); } }, .7);
+      });
+      fin(t);
+    },
+    takeaways: el => {
+      const t = T(), rows = [...el.querySelectorAll('.tk')];
+      items(t, el.querySelectorAll('.a'), 0, .8);
+      ring(t, 'lark', .05);
+      ring(t, 'vault', .85); ring(t, 'code', .85);
+      ring(t, 'code', 1.65);
+      void rows;
+      fin(t);
+    }
+  };
+
+  const notesText = document.getElementById('notesText'), notesEl = document.getElementById('notes');
+  let shown = -1;
+  function show(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    if (n === shown) return;
+    const first = shown < 0;
+    if (shown >= 0) slides[shown].classList.remove('active');
+    stopJobs();
+    idx = shown = n;
+    const el = slides[idx];
+    el.classList.add('active');
+    el.querySelectorAll('.sa').forEach(p => initSA(p)(1));
+    applyView(el.dataset.view || 'home', first);
+    document.getElementById('counter').textContent = `${idx + 1} / ${total}`;
+    document.getElementById('secLabel').textContent = idx ? 'How we work' : '';
+    document.getElementById('progress').style.width = ((idx + 1) / total * 100) + '%';
+    const nt = el.querySelector('aside.notes');
+    notesText.textContent = nt ? nt.textContent : '';
+    hdr(el);
+    (builders[el.dataset.anim] || generic)(el);
+    history.replaceState(null, '', '#' + (idx + 1));
+  }
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(idx + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(idx - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(total - 1);
+    if (e.key === 'n' || e.key === 'N') notesEl.classList.toggle('on');
+    if (e.key === 'f' || e.key === 'F') { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.getElementById('viewport').addEventListener('click', e => !e.target.closest('a') && show(idx + (e.clientX < innerWidth * .25 ? -1 : 1)));
+  show(Math.max(0, parseInt((location.hash || '#1').slice(1), 10) - 1));
+})();
+</script>
+</body>
+</html>
