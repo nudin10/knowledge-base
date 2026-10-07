@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b1120;
+  --card: #141e33;
+  --border: #2a3754;
+  --fg: #f1f5f9;
+  --fg-2: #cbd5e1;
+  --muted: #94a3b8;
+  --after: #5ab4e8;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh; color: var(--fg); font-family: var(--font-body); -webkit-font-smoothing: antialiased;
+  background: radial-gradient(1200px 700px at 85% -10%, #142039 0%, var(--bg) 55%) fixed, var(--bg);
+}
+main { max-width: 760px; margin: 0 auto; padding: 96px 16px 64px; }
+.kicker { font-family: var(--font-mono); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+h1 { font-size: clamp(40px, 8vw, 64px); line-height: 1.05; font-weight: 700; letter-spacing: -.02em; margin-bottom: 48px; }
+ul { list-style: none; display: grid; gap: 14px; }
+a.card {
+  display: block; padding: 22px 26px; border-radius: var(--radius); text-decoration: none; color: inherit;
+  background: var(--card); border: 1px solid var(--border); transition: border-color .15s, transform .15s;
+}
+a.card:hover, a.card:focus-visible { border-color: var(--after); transform: translateY(-2px); outline: none; }
+.card h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+.card p { font-size: 16px; line-height: 1.5; color: var(--fg-2); }
+.card .arrow { color: var(--after); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">Knowledge Base</div>
+  <h1>Pages</h1>
+  <!-- Add a new <li> here for each page. -->
+  <ul>
+    <li>
+      <a class="card" href="how-we-work.html">
+        <h2>How We Work <span class="arrow">→</span></h2>
+        <p>How we work with agents.</p>
+      </a>
+    </li>
+  </ul>
+</main>
+</body>
+</html>
