@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contract Repo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Same colour grammar as how-we-work.html: sky blue = in this repo / works, vermillion dashed = problem, yellow = warning, slate = everything else. */
+:root {
+  --bg: #0b1120;
+  --card: #141e33;
+  --card-2: #1a2540;
+  --border: #2a3754;
+  --fg: #f1f5f9;
+  --fg-2: #cbd5e1;
+  --muted: #94a3b8;
+  --slate: #64748b;
+  --before: #e8743b;
+  --before-soft: rgba(232,116,59,.14);
+  --after: #5ab4e8;
+  --after-soft: rgba(90,180,232,.14);
+  --warn: #e3cf5a;
+  --warn-soft: rgba(227,207,90,.14);
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #060a14; overflow: hidden; }
+body { color: var(--fg); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+
+#viewport { position: fixed; inset: 0; }
+#stage {
+  width: 1600px; height: 900px; position: absolute; left: 50%; top: 50%; overflow: hidden;
+  background: radial-gradient(1200px 700px at 85% -10%, #142039 0%, var(--bg) 55%);
+  transform-origin: center center;
+}
+.slide { position: absolute; inset: 0; padding: 64px 96px 100px; display: none; flex-direction: column; }
+.slide.active { display: flex; }
+.slide.active > * { animation: up .45s cubic-bezier(.2,.7,.2,1) both; }
+.slide.active > *:nth-child(2) { animation-delay: .06s; }
+.slide.active > *:nth-child(3) { animation-delay: .12s; }
+.slide.active > *:nth-child(4) { animation-delay: .18s; }
+.slide.active > *:nth-child(n+5) { animation-delay: .24s; }
+@keyframes up { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { .slide.active > * { animation: none; } }
+
+.kicker { font-family: var(--font-mono); font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+h1 { font-size: 92px; line-height: 1.02; font-weight: 700; letter-spacing: -.02em; }
+h2 { font-size: 54px; line-height: 1.08; font-weight: 700; letter-spacing: -.015em; margin-bottom: 40px; }
+h3 { font-size: 26px; font-weight: 600; }
+.lead { font-size: 28px; line-height: 1.4; color: var(--fg-2); }
+.cap { font-size: 20px; line-height: 1.45; color: var(--muted); }
+.small { font-size: 16px; line-height: 1.45; color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.after { color: var(--after); } .warn { color: var(--warn); } .before { color: var(--before); } .muted { color: var(--muted); }
+code { font-family: var(--font-mono); font-size: .88em; background: #0b1426; border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; }
+.card.on { border-color: var(--after); }
+.card.bad { border: 2px dashed var(--before); background: linear-gradient(var(--before-soft), var(--before-soft)), var(--card); }
+.card h3 { margin-bottom: 8px; }
+.card p { font-size: 19px; line-height: 1.45; color: var(--fg-2); }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 15px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--fg-2); white-space: nowrap; vertical-align: middle; }
+.tag.after { border-color: var(--after); color: var(--after); background: var(--after-soft); }
+.tag.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
+.tag.before { border-color: var(--before); color: var(--before); background: var(--before-soft); border-style: dashed; }
+pre.code { font-family: var(--font-mono); font-size: 17px; line-height: 1.6; white-space: pre; margin: 0; color: var(--fg); background: #0b1426; border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
+pre.code .k { color: #94a3b8; } pre.code .s { color: #e3cf5a; } pre.code .c { color: #64748b; } pre.code .f { color: var(--after); } pre.code .b { color: var(--before); }
+.colh { font-family: var(--font-mono); font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+ul.l { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+ul.l li { font-size: 20px; line-height: 1.4; color: var(--fg-2); padding-left: 22px; position: relative; }
+ul.l li::before { content: ""; position: absolute; left: 2px; top: .58em; width: 8px; height: 8px; border-radius: 2px; background: var(--slate); }
+
+.row { display: flex; gap: 28px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 28px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grow { flex: 1; min-width: 0; }
+
+/* Slide-specific */
+.flow { position: relative; width: 820px; height: 470px; flex: none; }
+.flow svg { position: absolute; inset: 0; }
+.node { position: absolute; border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 16px 20px; }
+.node .t { font-size: 22px; font-weight: 600; }
+.node .s { font-size: 16px; color: var(--muted); margin-top: 4px; line-height: 1.35; }
+.node.on { border-color: var(--after); }
+.node.out { border-style: dashed; border-color: #475569; }
+.step { display: grid; grid-template-columns: 52px 1fr; gap: 18px; align-items: start; }
+.step .n { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--after); color: var(--after); display: grid; place-items: center; font-family: var(--font-mono); font-size: 18px; }
+.step .t { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+.step pre.code { font-size: 16px; padding: 10px 14px; }
+.step .s { font-size: 17px; color: var(--muted); margin-top: 8px; }
+table.t { border-collapse: collapse; width: 100%; font-size: 19px; }
+table.t th { text-align: left; font-family: var(--font-mono); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 0 16px 12px 0; border-bottom: 1px solid var(--border); }
+table.t td { padding: 12px 16px 12px 0; border-bottom: 1px solid #1d2943; color: var(--fg-2); vertical-align: top; }
+table.t td:first-child { font-family: var(--font-mono); color: var(--fg); }
+table.t td.m { font-family: var(--font-mono); font-size: 17px; }
+.cost { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; border-bottom: 1px solid #1d2943; }
+.cost .num { font-family: var(--font-mono); font-weight: 700; font-size: 30px; color: var(--before); width: 120px; flex: none; }
+.cost .t { font-size: 20px; color: var(--fg-2); }
+.gap { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding: 14px 18px; border-radius: 12px; background: var(--card); border: 1px solid var(--border); }
+.gap .i { font-family: var(--font-mono); font-size: 20px; line-height: 1.3; }
+.gap .t { font-size: 20px; font-weight: 600; color: var(--fg); line-height: 1.3; }
+.gap .s { font-size: 16px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.gap.bad { border: 2px dashed var(--before); }
+.gap.warn { border-color: var(--warn); }
+
+#chrome { position: absolute; left: 96px; right: 96px; bottom: 30px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 16px; color: #56637a; z-index: 20; pointer-events: none; }
+#chrome .draft { color: var(--warn); }
+#chrome .draft b { font-weight: 600; letter-spacing: .12em; border: 1px solid var(--warn); border-radius: 4px; padding: 1px 6px; margin-right: 10px; background: var(--warn-soft); }
+#progress { position: absolute; left: 0; top: 0; height: 4px; background: var(--after); width: 0; z-index: 30; transition: width .35s ease; }
+#help { position: fixed; top: 14px; right: 18px; font-family: var(--font-mono); font-size: 12px; color: #4b5870; z-index: 60; }
+a.lk { color: var(--after); text-decoration: none; border-bottom: 1px dotted #4b5a78; }
+a.lk:hover { border-bottom-color: var(--after); }
+</style>
+</head>
+<body>
+<div id="help">← → move · F fullscreen</div>
+<div id="viewport"><div id="stage">
+<div id="progress"></div>
+
+<!-- 1. Title -->
+<section class="slide" style="justify-content:center">
+  <div class="kicker"><span class="after">●</span> Repo walkthrough &nbsp;<span class="tag warn">DRAFT</span></div>
+  <h1>Contract repo:<br>agree on the API first</h1>
+  <p class="lead" style="margin-top:30px; max-width:1000px">A starter kit for contract driven development: OpenAPI contracts, <code>make</code> shortcuts, and a mock server and Swagger UI that run in containers.</p>
+  <p class="cap mono" style="margin-top:28px"><a class="lk" href="https://github.com/nudin10/contract-repo">github.com/nudin10/contract-repo</a> · October 2026</p>
+</section>
+
+<!-- 2. Why -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2>Today, teams clarify the API after they build it</h2>
+  <div class="row">
+    <div class="grid3 grow" style="grid-template-columns:1fr 1fr 1fr; flex:1.9">
+      <div class="card bad"><h3>Clarify after building</h3><p>Coding starts before front end and back end agree. Mismatched assumptions surface at integration time.</p></div>
+      <div class="card bad"><h3>Docs drift</h3><p>API docs are hand-written wiki pages, updated after release, so they're stale during the sprint.</p></div>
+      <div class="card bad"><h3>The waiting game</h3><p>With no contract up front, consumers wait for the back end to finish. Work runs in sequence, not in parallel.</p></div>
+    </div>
+    <div class="grow" style="flex:1">
+      <div class="colh">Each late mismatch costs, on average</div>
+      <div class="cost"><span class="num">2–3 d</span><span class="t">change and redeploy code</span></div>
+      <div class="cost"><span class="num">1 d</span><span class="t">reopen and re-review pull requests</span></div>
+      <div class="cost"><span class="num">1 d</span><span class="t">re-run tests</span></div>
+      <p class="small" style="margin-top:14px">plus sync-up meetings and context switching. Team estimates.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. The practice -->
+<section class="slide">
+  <div class="kicker">The practice</div>
+  <h2>Define expectations before implementation</h2>
+  <div class="row" style="align-items:center; gap:56px">
+    <div class="grow">
+      <p class="lead">In contract driven development, the API contract, written as an <b>OpenAPI</b> file, is the single source of truth.</p>
+      <p class="cap" style="margin-top:24px">Teams argue about the contract during design, in a pull request, instead of in chat after the code exists. Once it's agreed, everything else is derived from it, so consumers and the provider can work at the same time.</p>
+      <p class="small" style="margin-top:24px"><span class="after">■</span> covered by this repo &nbsp; <span class="muted">┄</span> outside this repo</p>
+    </div>
+    <div class="flow">
+      <svg viewBox="0 0 820 470" aria-hidden="true">
+        <g fill="none" stroke-width="2">
+          <path d="M290 235 C 360 235, 360 58, 440 58" stroke="#5ab4e8"/>
+          <path d="M290 235 C 360 235, 360 180, 440 180" stroke="#5ab4e8"/>
+          <path d="M290 235 C 360 235, 360 300, 440 300" stroke="#475569" stroke-dasharray="5 6"/>
+          <path d="M290 235 C 360 235, 360 420, 440 420" stroke="#475569" stroke-dasharray="5 6"/>
+        </g>
+      </svg>
+      <div class="node on" style="left:0; top:170px; width:290px"><div class="t">OpenAPI contract</div><div class="s mono">services/&lt;svc&gt;/&lt;svc&gt;.yaml<br>reviewed in a pull request</div></div>
+      <div class="node on" style="left:440px; top:14px; width:380px"><div class="t">Mock server <span class="mono muted" style="font-size:15px">Prism</span></div><div class="s">consumers integrate on day one</div></div>
+      <div class="node on" style="left:440px; top:136px; width:380px"><div class="t">API docs <span class="mono muted" style="font-size:15px">Swagger UI</span></div><div class="s">always match the contract</div></div>
+      <div class="node out" style="left:440px; top:256px; width:380px"><div class="t">Implementation</div><div class="s">provider builds to the contract</div></div>
+      <div class="node out" style="left:440px; top:376px; width:380px"><div class="t">Contract tests</div><div class="s">check the service against it</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Hot and cold docs -->
+<section class="slide">
+  <div class="kicker">Documentation</div>
+  <h2>Swagger for building, the wiki for context</h2>
+  <div class="row" style="gap:40px">
+    <div class="grow">
+      <div class="grid2" style="gap:24px">
+        <div class="card on"><div class="colh after">Hot tier · Swagger UI</div><p>Generated from the contract, so it's current during the sprint. Interactive, searchable, and you can try requests in the page.</p></div>
+        <div class="card"><div class="colh">Cold tier · wiki pages</div><p>Written after release, once edge cases are known. Rich text, tables and images. Linked from Swagger.</p></div>
+      </div>
+      <p class="cap" style="margin-top:28px">This isn't double work, because each fact lives in one place. The contract holds the structure. The wiki holds the story.</p>
+    </div>
+    <div class="grow" style="max-width:560px">
+      <table class="t">
+        <tr><th>Information</th><th>Lives in</th></tr>
+        <tr><td style="font-family:var(--font-body)">Request and response structure</td><td class="after m">Swagger</td></tr>
+        <tr><td style="font-family:var(--font-body)">Which fields are optional</td><td class="after m">Swagger</td></tr>
+        <tr><td style="font-family:var(--font-body)">What each field is for</td><td class="after m">Swagger</td></tr>
+        <tr><td style="font-family:var(--font-body)">Scenario walkthroughs</td><td class="m">Wiki</td></tr>
+        <tr><td style="font-family:var(--font-body)">API-to-UI mapping</td><td class="m">Wiki</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Where the repo fits -->
+<section class="slide">
+  <div class="kicker">This repo</div>
+  <h2>The smallest version of the practice that works</h2>
+  <div class="grid3">
+    <div class="card on"><div class="colh after">1 · Maintain</div><h3>Keep contracts in git</h3><p>One folder per service. Changes go through pull requests, so the diff is the design review.</p></div>
+    <div class="card on"><div class="colh after">2 · Mock</div><h3>Run a fake server</h3><p>One command starts Prism on your machine, answering with the examples in the contract.</p></div>
+    <div class="card on"><div class="colh after">3 · Document</div><h3>Browse it in Swagger UI</h3><p>One command serves the contract as interactive docs on your machine.</p></div>
+  </div>
+  <div class="row" style="margin-top:40px; align-items:center; gap:18px">
+    <span class="tag">only needs</span><span class="lead">Docker or Podman. No language runtime or packages to install.</span>
+  </div>
+</section>
+
+<!-- 6. What's in it -->
+<section class="slide">
+  <div class="kicker">Layout</div>
+  <h2>11 files, 2 commits</h2>
+  <div class="row" style="gap:40px">
+<pre class="code" style="flex:none">contract-repo/
+├── makefile                  <span class="c"># every command lives here</span>
+├── README.md
+├── LICENSE · .gitignore
+├── .spectral.yaml            <span class="c"># Spectral lint rules</span>
+├── templates/
+│   ├── service.template.yaml <span class="c"># root spec for a new service</span>
+│   ├── api.template.yaml     <span class="c"># starter endpoint (health check)</span>
+│   └── schemas.template.yaml <span class="c"># sample schema</span>
+└── services/
+    └── example/
+        ├── <span class="f">example.yaml</span>          <span class="c"># root OpenAPI 3.1 spec</span>
+        ├── paths/
+        │   └── health_check.yaml
+        └── components/
+            └── components.yaml <span class="c"># shared components</span></pre>
+    <div class="grow" style="display:flex; flex-direction:column; gap:20px">
+      <div class="card"><h3><span class="mono after">services/</span></h3><p>The contracts. One folder per service, each with a root spec plus <code>paths/</code> and <code>components/</code>.</p></div>
+      <div class="card"><h3><span class="mono after">templates/</span></h3><p>What the scaffolding commands copy. Edit these to change what every new service starts with.</p></div>
+      <div class="card"><h3><span class="mono after">makefile</span></h3><p>Scaffolding, mock server and docs. Run <code>make</code> on its own to list the commands.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Anatomy of a service -->
+<section class="slide">
+  <div class="kicker">Anatomy of a service</div>
+  <h2>One root file per service, one file per endpoint</h2>
+  <div class="row" style="gap:28px; align-items:flex-start">
+    <div class="grow">
+      <div class="colh">services/example/example.yaml</div>
+<pre class="code"><span class="k">openapi:</span> 3.1.0
+<span class="k">info:</span>
+  <span class="k">title:</span> example
+  <span class="k">version:</span> 1.0.0
+<span class="k">paths:</span>
+  <span class="f">/example:</span>
+    <span class="k">$ref:</span> <span class="s">'./paths/path-to-endpoint-file.yaml'</span>
+<span class="k">components:</span></pre>
+      <p class="cap" style="margin-top:18px">The root spec lists every path and points each one at its own file with <code>$ref</code>.</p>
+    </div>
+    <div class="grow">
+      <div class="colh">services/example/paths/health_check.yaml</div>
+<pre class="code"><span class="k">get:</span>
+  <span class="k">summary:</span> Health check endpoint
+  <span class="k">responses:</span>
+    <span class="s">"200":</span>
+      <span class="k">content:</span>
+        <span class="k">application/json:</span>
+          <span class="k">schema:</span>
+            <span class="k">type:</span> object
+            <span class="k">properties:</span>
+              <span class="k">status:</span>
+                <span class="k">type:</span> string
+                <span class="f">example: ok</span>  <span class="c"># what the mock returns</span></pre>
+      <p class="cap" style="margin-top:18px"><code>components/</code> holds shared schemas, parameters, responses, request bodies and headers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Workflow -->
+<section class="slide">
+  <div class="kicker">Workflow</div>
+  <h2>Six make targets cover the whole loop</h2>
+  <div class="grid2" style="gap:30px 48px">
+    <div class="step"><div class="n">1</div><div><div class="t">Onboard a service</div><pre class="code">make new-service SERVICE=orders</pre></div></div>
+    <div class="step"><div class="n">2</div><div><div class="t">Add an endpoint</div><pre class="code">make new-api SERVICE=orders API_NAME=order-summary</pre></div></div>
+    <div class="step"><div class="n">3</div><div><div class="t">Mock it</div><pre class="code">make start-mock SERVICE=orders</pre><div class="s">→ http://127.0.0.1:4010 &nbsp;·&nbsp; stop with <code>make stop-mock SERVICE=orders</code></div></div></div>
+    <div class="step"><div class="n">4</div><div><div class="t">Document it</div><pre class="code">make start-swagger SERVICE=orders</pre><div class="s">→ http://127.0.0.1:8080 &nbsp;·&nbsp; stop with <code>make stop-swagger</code></div></div></div>
+  </div>
+  <p class="cap" style="margin-top:36px">Run every command from the repo root. Add <code>RUNTIME=podman</code> to use Podman instead of Docker.</p>
+</section>
+
+<!-- 9. Scaffolding -->
+<section class="slide">
+  <div class="kicker">Scaffolding</div>
+  <h2>The make targets write boilerplate. You wire it up.</h2>
+  <div class="row" style="gap:28px; align-items:flex-start">
+    <div class="grow">
+      <div class="colh">make new-service SERVICE=orders</div>
+<pre class="code">services/orders/
+├── <span class="f">orders.yaml</span>   <span class="c"># template, title set to "orders"</span>
+├── paths/
+└── components/
+    ├── components.yaml
+    ├── schemas/       parameters/
+    ├── responses/     request_bodies/
+    └── headers/</pre>
+      <div class="colh" style="margin-top:24px">make new-api SERVICE=orders API_NAME=order-summary</div>
+<pre class="code">services/orders/paths/<span class="f">order-summary.yaml</span>  <span class="c"># copy of api.template</span></pre>
+    </div>
+    <div class="grow">
+      <div class="card" style="border-color:var(--warn)">
+        <div class="colh warn">Still done by hand</div>
+        <ul class="l">
+          <li>Replace the copied health-check body with the real endpoint.</li>
+          <li>Add the path to the root spec. <code>new-api</code> doesn't do this:</li>
+        </ul>
+<pre class="code" style="margin:12px 0 14px 22px"><span class="k">paths:</span>
+  <span class="f">/order-summary:</span>
+    <span class="k">$ref:</span> <span class="s">'./paths/order-summary.yaml'</span></pre>
+        <ul class="l">
+          <li>Delete the placeholder <code>/example</code> path that the template adds.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. Mock and docs -->
+<section class="slide">
+  <div class="kicker">Mock and docs</div>
+  <h2>Run the contract before anyone writes the service</h2>
+  <div class="row" style="gap:28px; align-items:flex-start">
+    <div class="grow">
+      <div class="colh after">start-mock runs</div>
+<pre class="code">docker run -d \
+  -p 127.0.0.1:<span class="f">4010</span>:4010 \
+  -v $PWD/services/orders:/spec \
+  --name mock-orders \
+  stoplight/prism:5 \
+  mock -h 0.0.0.0 /spec/orders.yaml</pre>
+<pre class="code" style="margin-top:16px"><span class="c">$</span> curl localhost:4010/health
+<span class="s">{"status":"ok"}</span></pre>
+      <p class="small" style="margin-top:10px">Prism answers with the <code>example</code> values in the contract.</p>
+    </div>
+    <div class="grow">
+      <div class="colh after">start-swagger runs</div>
+<pre class="code">docker run -d \
+  -p 127.0.0.1:<span class="f">8080</span>:8080 \
+  -v $PWD/services/orders:/oas \
+  -e SWAGGER_JSON=/oas/orders.yaml \
+  --name swagger-ui \
+  swaggerapi/swagger-ui:v5.29.4</pre>
+      <ul class="l" style="margin-top:20px">
+        <li>The service folder is mounted, so <code>$ref</code> files resolve.</li>
+        <li>Both bind to <code>127.0.0.1</code>, so they're reachable only from your machine.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 11. Settings -->
+<section class="slide">
+  <div class="kicker">Settings</div>
+  <h2>Every default can be overridden on the command line</h2>
+  <table class="t" style="max-width:1300px">
+    <tr><th>Variable</th><th>Default</th><th>Used by</th></tr>
+    <tr><td>SERVICE</td><td class="m">new-service</td><td>every target except help</td></tr>
+    <tr><td>API_NAME</td><td class="m">new-api</td><td>new-api</td></tr>
+    <tr><td>RUNTIME</td><td class="m">docker</td><td>start / stop targets · or <code>podman</code></td></tr>
+    <tr><td>PORT</td><td class="m">4010</td><td>start-mock</td></tr>
+    <tr><td>UI_PORT</td><td class="m">8080</td><td>start-swagger</td></tr>
+    <tr><td>PRISM_IMAGE</td><td class="m">stoplight/prism:5</td><td>start-mock</td></tr>
+    <tr><td>SWAGGER_IMAGE</td><td class="m">swaggerapi/swagger-ui:v5.29.4</td><td>start-swagger</td></tr>
+    <tr><td>SPEC_DIR</td><td class="m">services/$(SERVICE)</td><td>start-mock, start-swagger</td></tr>
+  </table>
+  <pre class="code" style="margin-top:28px; align-self:flex-start">make start-mock SERVICE=orders RUNTIME=podman PORT=4011</pre>
+</section>
+
+
+<!-- 12. Try it -->
+<section class="slide">
+  <div class="kicker">Try it</div>
+  <h2>From clone to a running mock</h2>
+  <div class="row" style="gap:40px; align-items:flex-start">
+<pre class="code" style="flex:none; font-size:18px">git clone https://github.com/nudin10/contract-repo
+cd contract-repo
+
+make new-service SERVICE=orders
+make new-api SERVICE=orders API_NAME=health
+
+<span class="c"># in services/orders/orders.yaml, change the path to:</span>
+<span class="c">#   /health:</span>
+<span class="c">#     $ref: './paths/health.yaml'</span>
+
+make start-mock SERVICE=orders PRISM_IMAGE=stoplight/prism:4
+curl localhost:4010/health        <span class="c"># {"status":"ok"}</span>
+
+make start-swagger SERVICE=orders <span class="c"># http://127.0.0.1:8080</span>
+
+make stop-mock SERVICE=orders
+make stop-swagger</pre>
+    <div class="grow">
+      <div class="card on"><div class="colh after">Checked</div><p>Each step above ran against the repo at <code>cc2faf2</code> on October 8, 2026. The mock returned <code>{"status":"ok"}</code> and Swagger UI loaded the spec.</p></div>
+    </div>
+  </div>
+</section>
+
+<div id="chrome"><span class="draft"><b>DRAFT</b>Not yet reviewed · based on contract-repo at cc2faf2</span><span id="counter"></span></div>
+</div></div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  let idx = -1;
+
+  const fit = () => { stage.style.transform = `translate(-50%, -50%) scale(${Math.min(innerWidth / 1600, innerHeight / 900)})`; };
+  addEventListener('resize', fit); fit();
+
+  function show(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    if (n === idx) return;
+    if (idx >= 0) slides[idx].classList.remove('active');
+    idx = n;
+    slides[idx].classList.add('active');
+    document.getElementById('counter').textContent = `${idx + 1} / ${total}`;
+    document.getElementById('progress').style.width = ((idx + 1) / total * 100) + '%';
+    history.replaceState(null, '', '#' + (idx + 1));
+  }
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(idx + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(idx - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(total - 1);
+    if (e.key === 'f' || e.key === 'F') { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.getElementById('viewport').addEventListener('click', e => !e.target.closest('a') && show(idx + (e.clientX < innerWidth * .25 ? -1 : 1)));
+  show(Math.max(0, parseInt((location.hash || '#1').slice(1), 10) - 1));
+})();
+</script>
+</body>
+</html>

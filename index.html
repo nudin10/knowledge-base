@@ -37,6 +37,8 @@ a.card:hover, a.card:focus-visible { border-color: var(--after); transform: tran
 .card h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
 .card p { font-size: 16px; line-height: 1.5; color: var(--fg-2); }
 .card .arrow { color: var(--after); font-family: var(--font-mono); }
+.tag { display: inline-block; vertical-align: middle; margin-left: 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .12em; padding: 2px 8px; border-radius: 999px; }
+.tag.draft { color: #e3cf5a; border: 1px solid #e3cf5a; background: rgba(227,207,90,.14); }
 .note { margin-top: 32px; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
 </style>
 </head>
@@ -50,6 +52,12 @@ a.card:hover, a.card:focus-visible { border-color: var(--after); transform: tran
       <a class="card" href="how-we-work.html">
         <h2>How We Work <span class="arrow">→</span></h2>
         <p>How we work with agents.</p>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="contract-repo.html">
+        <h2>Contract Repo <span class="tag draft">DRAFT</span> <span class="arrow">→</span></h2>
+        <p>A walkthrough of the contract-driven development starter repo: contracts, mock server and Swagger UI.</p>
       </a>
     </li>
   </ul>
