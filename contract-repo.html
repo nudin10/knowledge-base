@@ -98,6 +98,7 @@ table.t th { text-align: left; font-family: var(--font-mono); font-size: 14px; l
 table.t td { padding: 12px 16px 12px 0; border-bottom: 1px solid #1d2943; color: var(--fg-2); vertical-align: top; }
 table.t td:first-child { font-family: var(--font-mono); color: var(--fg); }
 table.t td.m { font-family: var(--font-mono); font-size: 17px; }
+table.t td.warn { color: var(--warn); }
 .cost { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; border-bottom: 1px solid #1d2943; }
 .cost .num { font-family: var(--font-mono); font-weight: 700; font-size: 30px; color: var(--before); width: 120px; flex: none; }
 .cost .t { font-size: 20px; color: var(--fg-2); }
@@ -208,7 +209,7 @@ a.lk:hover { border-bottom-color: var(--after); }
   <div class="kicker">This repo</div>
   <h2>The smallest version of the practice that works</h2>
   <div class="grid3">
-    <div class="card on"><div class="colh after">1 · Maintain</div><h3>Keep contracts in git</h3><p>One folder per service. Changes go through pull requests, so the diff is the design review.</p></div>
+    <div class="card on"><div class="colh after">1 · Maintain</div><h3>Keep contracts in git</h3><p>One folder per service. Changes go through pull requests, so the diff is the design review. <code>make lint</code> checks them.</p></div>
     <div class="card on"><div class="colh after">2 · Mock</div><h3>Run a fake server</h3><p>One command starts Prism on your machine, answering with the examples in the contract.</p></div>
     <div class="card on"><div class="colh after">3 · Document</div><h3>Browse it in Swagger UI</h3><p>One command serves the contract as interactive docs on your machine.</p></div>
   </div>
@@ -220,28 +221,29 @@ a.lk:hover { border-bottom-color: var(--after); }
 <!-- 6. What's in it -->
 <section class="slide">
   <div class="kicker">Layout</div>
-  <h2>11 files, 2 commits</h2>
+  <h2>A makefile, templates and the contracts</h2>
   <div class="row" style="gap:40px">
 <pre class="code" style="flex:none">contract-repo/
 ├── makefile                  <span class="c"># every command lives here</span>
 ├── README.md
 ├── LICENSE · .gitignore
-├── .spectral.yaml            <span class="c"># Spectral lint rules</span>
+├── redocly.yaml              <span class="c"># lint rules</span>
 ├── templates/
 │   ├── service.template.yaml <span class="c"># root spec for a new service</span>
 │   ├── api.template.yaml     <span class="c"># starter endpoint (health check)</span>
-│   └── schemas.template.yaml <span class="c"># sample schema</span>
+│   └── schemas.template.yaml <span class="c"># starter shared schema</span>
 └── services/
     └── example/
         ├── <span class="f">example.yaml</span>          <span class="c"># root OpenAPI 3.1 spec</span>
         ├── paths/
         │   └── health_check.yaml
         └── components/
-            └── components.yaml <span class="c"># shared components</span></pre>
+            ├── components.yaml
+            └── schemas/  parameters/  …</pre>
     <div class="grow" style="display:flex; flex-direction:column; gap:20px">
       <div class="card"><h3><span class="mono after">services/</span></h3><p>The contracts. One folder per service, each with a root spec plus <code>paths/</code> and <code>components/</code>.</p></div>
       <div class="card"><h3><span class="mono after">templates/</span></h3><p>What the scaffolding commands copy. Edit these to change what every new service starts with.</p></div>
-      <div class="card"><h3><span class="mono after">makefile</span></h3><p>Scaffolding, mock server and docs. Run <code>make</code> on its own to list the commands.</p></div>
+      <div class="card"><h3><span class="mono after">makefile</span></h3><p>Scaffolding, linting, mock server and docs. Run <code>make</code> on its own to list the commands.</p></div>
     </div>
   </div>
 </section>
@@ -258,9 +260,9 @@ a.lk:hover { border-bottom-color: var(--after); }
   <span class="k">title:</span> example
   <span class="k">version:</span> 1.0.0
 <span class="k">paths:</span>
-  <span class="f">/example:</span>
-    <span class="k">$ref:</span> <span class="s">'./paths/path-to-endpoint-file.yaml'</span>
-<span class="k">components:</span></pre>
+  <span class="f">/health:</span>
+    <span class="k">$ref:</span> <span class="s">'./paths/health_check.yaml'</span>
+<span class="k">components:</span> {}</pre>
       <p class="cap" style="margin-top:18px">The root spec lists every path and points each one at its own file with <code>$ref</code>.</p>
     </div>
     <div class="grow">
@@ -285,12 +287,13 @@ a.lk:hover { border-bottom-color: var(--after); }
 <!-- 8. Workflow -->
 <section class="slide">
   <div class="kicker">Workflow</div>
-  <h2>Six make targets cover the whole loop</h2>
-  <div class="grid2" style="gap:30px 48px">
+  <h2>Seven make targets cover the whole loop</h2>
+  <div class="grid2" style="gap:26px 48px; grid-auto-flow:column; grid-template-rows:repeat(3, auto)">
     <div class="step"><div class="n">1</div><div><div class="t">Onboard a service</div><pre class="code">make new-service SERVICE=orders</pre></div></div>
     <div class="step"><div class="n">2</div><div><div class="t">Add an endpoint</div><pre class="code">make new-api SERVICE=orders API_NAME=order-summary</pre></div></div>
-    <div class="step"><div class="n">3</div><div><div class="t">Mock it</div><pre class="code">make start-mock SERVICE=orders</pre><div class="s">→ http://127.0.0.1:4010 &nbsp;·&nbsp; stop with <code>make stop-mock SERVICE=orders</code></div></div></div>
-    <div class="step"><div class="n">4</div><div><div class="t">Document it</div><pre class="code">make start-swagger SERVICE=orders</pre><div class="s">→ http://127.0.0.1:8080 &nbsp;·&nbsp; stop with <code>make stop-swagger</code></div></div></div>
+    <div class="step"><div class="n">3</div><div><div class="t">Check it</div><pre class="code">make lint SERVICE=orders</pre></div></div>
+    <div class="step"><div class="n">4</div><div><div class="t">Mock it</div><pre class="code">make start-mock SERVICE=orders</pre><div class="s">→ http://127.0.0.1:4010 &nbsp;·&nbsp; stop with <code>make stop-mock SERVICE=orders</code></div></div></div>
+    <div class="step"><div class="n">5</div><div><div class="t">Document it</div><pre class="code">make start-swagger SERVICE=orders</pre><div class="s">→ http://127.0.0.1:8080 &nbsp;·&nbsp; stop with <code>make stop-swagger SERVICE=orders</code></div></div></div>
   </div>
   <p class="cap" style="margin-top:36px">Run every command from the repo root. Add <code>RUNTIME=podman</code> to use Podman instead of Docker.</p>
 </section>
@@ -298,34 +301,36 @@ a.lk:hover { border-bottom-color: var(--after); }
 <!-- 9. Scaffolding -->
 <section class="slide">
   <div class="kicker">Scaffolding</div>
-  <h2>The make targets write boilerplate. You wire it up.</h2>
+  <h2>The make targets write the boilerplate and wire it up</h2>
   <div class="row" style="gap:28px; align-items:flex-start">
     <div class="grow">
       <div class="colh">make new-service SERVICE=orders</div>
 <pre class="code">services/orders/
 ├── <span class="f">orders.yaml</span>   <span class="c"># template, title set to "orders"</span>
 ├── paths/
+│   └── health.yaml  <span class="c"># /health, mockable right away</span>
 └── components/
     ├── components.yaml
     ├── schemas/       parameters/
     ├── responses/     request_bodies/
     └── headers/</pre>
       <div class="colh" style="margin-top:24px">make new-api SERVICE=orders API_NAME=order-summary</div>
-<pre class="code">services/orders/paths/<span class="f">order-summary.yaml</span>  <span class="c"># copy of api.template</span></pre>
-    </div>
-    <div class="grow">
-      <div class="card" style="border-color:var(--warn)">
-        <div class="colh warn">Still done by hand</div>
-        <ul class="l">
-          <li>Replace the copied health-check body with the real endpoint.</li>
-          <li>Add the path to the root spec. <code>new-api</code> doesn't do this:</li>
-        </ul>
-<pre class="code" style="margin:12px 0 14px 22px"><span class="k">paths:</span>
+<pre class="code">paths/<span class="f">order-summary.yaml</span>  <span class="c"># copy of api.template</span>
+orders.yaml               <span class="c"># gains the path:</span>
   <span class="f">/order-summary:</span>
     <span class="k">$ref:</span> <span class="s">'./paths/order-summary.yaml'</span></pre>
+    </div>
+    <div class="grow">
+      <div class="card on">
+        <div class="colh after">Your part</div>
         <ul class="l">
-          <li>Delete the placeholder <code>/example</code> path that the template adds.</li>
+          <li>Replace the copied health-check body with the real endpoint.</li>
+          <li>Run <code>make lint SERVICE=orders</code> before you open the pull request.</li>
         </ul>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <div class="colh">Guard rails</div>
+        <p>Both commands stop with a clear message if <code>SERVICE</code> or <code>API_NAME</code> is missing, if the service doesn't exist yet, or if the file already exists.</p>
       </div>
     </div>
   </div>
@@ -343,7 +348,8 @@ a.lk:hover { border-bottom-color: var(--after); }
   -v $PWD/services/orders:/spec \
   --name mock-orders \
   stoplight/prism:5 \
-  mock -h 0.0.0.0 /spec/orders.yaml</pre>
+  mock -h 0.0.0.0 --multiprocess=false \
+  /spec/orders.yaml</pre>
 <pre class="code" style="margin-top:16px"><span class="c">$</span> curl localhost:4010/health
 <span class="s">{"status":"ok"}</span></pre>
       <p class="small" style="margin-top:10px">Prism answers with the <code>example</code> values in the contract.</p>
@@ -354,11 +360,12 @@ a.lk:hover { border-bottom-color: var(--after); }
   -p 127.0.0.1:<span class="f">8080</span>:8080 \
   -v $PWD/services/orders:/oas \
   -e SWAGGER_JSON=/oas/orders.yaml \
-  --name swagger-ui \
+  --name swagger-orders \
   swaggerapi/swagger-ui:v5.29.4</pre>
       <ul class="l" style="margin-top:20px">
         <li>The service folder is mounted, so <code>$ref</code> files resolve.</li>
         <li>Both bind to <code>127.0.0.1</code>, so they're reachable only from your machine.</li>
+        <li>Containers are named per service. To run several at once, give each its own <code>PORT</code> and <code>UI_PORT</code>.</li>
       </ul>
     </div>
   </div>
@@ -367,21 +374,21 @@ a.lk:hover { border-bottom-color: var(--after); }
 <!-- 11. Settings -->
 <section class="slide">
   <div class="kicker">Settings</div>
-  <h2>Every default can be overridden on the command line</h2>
+  <h2>Settings are plain make variables</h2>
   <table class="t" style="max-width:1300px">
     <tr><th>Variable</th><th>Default</th><th>Used by</th></tr>
-    <tr><td>SERVICE</td><td class="m">new-service</td><td>every target except help</td></tr>
-    <tr><td>API_NAME</td><td class="m">new-api</td><td>new-api</td></tr>
-    <tr><td>RUNTIME</td><td class="m">docker</td><td>start / stop targets · or <code>podman</code></td></tr>
+    <tr><td>SERVICE</td><td class="m warn">required</td><td>every target except help</td></tr>
+    <tr><td>API_NAME</td><td class="m warn">required</td><td>new-api</td></tr>
+    <tr><td>RUNTIME</td><td class="m">docker</td><td>lint, start / stop targets · or <code>podman</code></td></tr>
     <tr><td>PORT</td><td class="m">4010</td><td>start-mock</td></tr>
     <tr><td>UI_PORT</td><td class="m">8080</td><td>start-swagger</td></tr>
     <tr><td>PRISM_IMAGE</td><td class="m">stoplight/prism:5</td><td>start-mock</td></tr>
     <tr><td>SWAGGER_IMAGE</td><td class="m">swaggerapi/swagger-ui:v5.29.4</td><td>start-swagger</td></tr>
-    <tr><td>SPEC_DIR</td><td class="m">services/$(SERVICE)</td><td>start-mock, start-swagger</td></tr>
+    <tr><td>REDOCLY_IMAGE</td><td class="m">redocly/cli:2.60.0</td><td>lint</td></tr>
+    <tr><td>SPEC_DIR</td><td class="m">services/$(SERVICE)</td><td>lint, start-mock, start-swagger</td></tr>
   </table>
   <pre class="code" style="margin-top:28px; align-self:flex-start">make start-mock SERVICE=orders RUNTIME=podman PORT=4011</pre>
 </section>
-
 
 <!-- 12. Try it -->
 <section class="slide">
@@ -392,26 +399,23 @@ a.lk:hover { border-bottom-color: var(--after); }
 cd contract-repo
 
 make new-service SERVICE=orders
-make new-api SERVICE=orders API_NAME=health
+make new-api SERVICE=orders API_NAME=order-summary
+make lint SERVICE=orders
 
-<span class="c"># in services/orders/orders.yaml, change the path to:</span>
-<span class="c">#   /health:</span>
-<span class="c">#     $ref: './paths/health.yaml'</span>
+make start-mock SERVICE=orders
+curl localhost:4010/order-summary  <span class="c"># {"status":"ok"}</span>
 
-make start-mock SERVICE=orders PRISM_IMAGE=stoplight/prism:4
-curl localhost:4010/health        <span class="c"># {"status":"ok"}</span>
-
-make start-swagger SERVICE=orders <span class="c"># http://127.0.0.1:8080</span>
+make start-swagger SERVICE=orders  <span class="c"># http://127.0.0.1:8080</span>
 
 make stop-mock SERVICE=orders
-make stop-swagger</pre>
+make stop-swagger SERVICE=orders</pre>
     <div class="grow">
-      <div class="card on"><div class="colh after">Checked</div><p>Each step above ran against the repo at <code>cc2faf2</code> on October 8, 2026. The mock returned <code>{"status":"ok"}</code> and Swagger UI loaded the spec.</p></div>
+      <div class="card on"><div class="colh after">Checked</div><p>Each step above ran with the default settings against the repo at <code>4c87805</code>. Lint passed, the mock returned <code>{"status":"ok"}</code> and Swagger UI loaded the spec.</p></div>
     </div>
   </div>
 </section>
 
-<div id="chrome"><span class="draft"><b>DRAFT</b>Not yet reviewed · based on contract-repo at cc2faf2</span><span id="counter"></span></div>
+<div id="chrome"><span class="draft"><b>DRAFT</b>Not yet reviewed · based on contract-repo at 4c87805</span><span id="counter"></span></div>
 </div></div>
 
 <script>
