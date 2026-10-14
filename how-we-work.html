@@ -169,7 +169,7 @@ a.box:hover { border-color: var(--after); }
       <span class="mono" style="font-size:17px; color:var(--muted)">we = one engineer + an AI agent</span>
     </div>
   </div>
-  <aside class="notes">A quick note: 'we' is one engineer and an AI coding agent. Most of this talk is about how the two split the work. This talk is about how I work, not about what I build. The picture on the right stays with us for the whole talk. It shows five places where context lives: the team docs in Lark, the code, a personal notes vault in Obsidian, the agent's memory files, and the working sessions. Each slide zooms into one of them, or into one arrow between them, so you always know which part we are talking about. Part 1 is about how the context is split up. Part 2 is about how changes ship. Part 3 is about agents and evidence.</aside>
+  <aside class="notes">A quick note: 'we' is one engineer and an AI coding agent. Most of this talk is about how the two split the work. This talk is about how I work, not about what I build. The picture on the right stays with us for the whole talk. It shows five places where context lives: the team docs in a shared wiki, the code, a personal notes vault in Obsidian, the agent's memory files, and the working sessions. Each slide zooms into one of them, or into one arrow between them, so you always know which part we are talking about. Part 1 is about how the context is split up. Part 2 is about how changes ship. Part 3 is about agents and evidence.</aside>
 </section>
 
 <section class="slide" data-title="Hook" data-anim="hook" data-view="sessL">
@@ -188,29 +188,29 @@ a.box:hover { border-color: var(--after); }
   <div class="p small mono hka" style="left:858px; top:340px; width:84px; text-align:center">agent</div>
   <div class="p small mono hka" style="left:780px; top:362px; width:240px; text-align:center; font-size:13px; white-space:nowrap"><span class="muted">○</span> new session · no memory</div>
   <div class="p card hkr" style="left:1100px; top:240px; width:420px; height:100px; padding:14px 20px; border:2px dashed var(--before); background:var(--before-soft)"><div style="font-size:22px"><span class="before">⚠</span> Confident, wrong work</div><div class="small" style="margin-top:6px">built the wrong feature, then reverted it</div></div>
-  <div class="p card hkl" style="left:380px; top:440px; width:400px; height:92px; padding:14px 20px; border-color:var(--after)"><div style="font-size:20px">▤ team docs (Lark) · the real scope</div><div class="small" style="margin-top:6px">a person had to supply it</div></div>
+  <div class="p card hkl" style="left:380px; top:440px; width:400px; height:92px; padding:14px 20px; border-color:var(--after)"><div style="font-size:20px">▤ team docs · the real scope</div><div class="small" style="margin-top:6px">a person had to supply it</div></div>
   <div class="p small mono hkx" style="left:912px; top:410px"><span class="before" style="font-size:18px">✕</span> never in context</div>
   <div class="p small mono hk2" style="left:786px; top:204px; font-size:13px">infers scope from what it finds</div>
   <p class="p hkq" style="left:380px; top:580px; width:1140px; font-size:21px; color:var(--fg-2)">Unstructured context: an agent with no memory builds on whatever it finds, and guesses the rest with full confidence.</p>
   <p class="p hkq" style="left:380px; top:640px; width:1140px; font-size:36px; font-weight:600; color:var(--fg)">So where should each kind of context live?</p>
-  <aside class="notes">I want to start with a failure, and the mechanism behind it. An agent starts every session with no memory, so it builds its picture of the task from whatever context it finds nearby: local files, leftovers on the branch, a draft that looks like a brief. If the real source is not where it looks, it infers the rest and builds on that guess with full confidence. Here is the real case. An agent was asked to complete a set of APIs on a branch. It looked at what was local: two database migrations that nothing used yet, and a draft document in the docs folder whose rules matched one of them. It read like a brief. The agent started to build, edited two files, and then had to revert both. The real scope was a page in the team docs, which live in Lark, and a person had to supply it, and that page described a different feature. The code it wrote was not the problem. It was confident, consistent work on the wrong thing, because the right context was not in the session. So the question for this talk is: where should each kind of context live, so that the right piece is in front of a person or an agent at the right time?</aside>
+  <aside class="notes">I want to start with a failure, and the mechanism behind it. An agent starts every session with no memory, so it builds its picture of the task from whatever context it finds nearby: local files, leftovers on the branch, a draft that looks like a brief. If the real source is not where it looks, it infers the rest and builds on that guess with full confidence. Here is the real case. An agent was asked to complete a set of APIs on a branch. It looked at what was local: two database migrations that nothing used yet, and a draft document in the docs folder whose rules matched one of them. It read like a brief. The agent started to build, edited two files, and then had to revert both. The real scope was a page in the team docs, and a person had to supply it, and that page described a different feature. The code it wrote was not the problem. It was confident, consistent work on the wrong thing, because the right context was not in the session. So the question for this talk is: where should each kind of context live, so that the right piece is in front of a person or an agent at the right time?</aside>
 </section>
 
 <section class="slide" data-title="Five layers" data-anim="layers" data-view="layers">
   <div class="kicker h">Part 1 · Context is layered</div>
   <h2 class="h">Five layers, five jobs</h2>
-  <div class="lab2 a" data-node="lark" style="left:925px; top:244px"><span class="t">Team docs (Lark): humans and agents</span><span class="pips" data-n="5"><i></i><i></i><i></i><i></i><i></i></span></div>
-  <div class="lab2 a" data-node="code" style="left:336px; top:596px"><span class="t">What is built, checked against Lark</span><span class="pips" data-n="4"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="docs" style="left:925px; top:244px"><span class="t">Team docs: humans and agents</span><span class="pips" data-n="5"><i></i><i></i><i></i><i></i><i></i></span></div>
+  <div class="lab2 a" data-node="code" style="left:336px; top:596px"><span class="t">What is built, checked against the docs</span><span class="pips" data-n="4"><i></i><i></i><i></i><i></i><i></i></span></div>
   <div class="lab2 a" data-node="vault" style="left:1069px; top:596px"><span class="t">Personal notes (Obsidian): why, for later</span><span class="pips" data-n="3"><i></i><i></i><i></i><i></i><i></i></span></div>
   <div class="lab2 a" data-node="memory" style="left:925px; top:752px"><span class="t">Agent memory files: working agreements</span><span class="pips" data-n="2"><i></i><i></i><i></i><i></i><i></i></span></div>
   <div class="lab2 a" data-node="sessions" style="left:580px; top:648px; align-items:flex-end"><span class="t">Scratch, thrown away</span><span class="pips" data-n="1"><i></i><i></i><i></i><i></i><i></i></span></div>
   <div class="p small" style="left:1100px; top:196px; text-align:right; width:420px"><span class="pips" style="display:inline-flex; vertical-align:-2px"><i class="f"></i></span>&nbsp; review bar: how much people check this layer</div>
   <div class="p a small" style="left:96px; top:752px; width:440px">Shared is what outlives a person, and what a team can take away.</div>
   <div class="p a small" style="left:96px; top:800px">Jira: tickets in markdown, linked from PRs.</div>
-  <aside class="notes">Each layer has one job and one audience. Lark is read by humans and by agents, so it has the highest bar for quality. The code is what is actually built, and I check it against Lark. The vault keeps the reasons for decisions, for whoever reads it later. Memory holds the working agreements between me and an AI agent, such as how to write commits. Sessions are scratch space: they are thrown away when the task is done. The squares on the right show how high the bar is for each layer. Jira sits beside all this: tickets are written in markdown and linked from the pull requests. The small badges show which layers are shared and which are local. Lark, the team docs, and the code, the repo, are shared: the whole team can read them. The vault, the author's notes, and memory, the agent memory files, are local to one machine, and sessions are local and temporary. Shared is what outlives a person, and what a team can take away. That is why longevity needs the shared layers.</aside>
+  <aside class="notes">Each layer has one job and one audience. The team docs are read by humans and by agents, so it has the highest bar for quality. The code is what is actually built, and I check it against the docs. The vault keeps the reasons for decisions, for whoever reads it later. Memory holds the working agreements between me and an AI agent, such as how to write commits. Sessions are scratch space: they are thrown away when the task is done. The squares on the right show how high the bar is for each layer. Jira sits beside all this: tickets are written in markdown and linked from the pull requests. The small badges show which layers are shared and which are local. The team docs and the code, the repo, are shared: the whole team can read them. The vault, the author's notes, and memory, the agent memory files, are local to one machine, and sessions are local and temporary. Shared is what outlives a person, and what a team can take away. That is why longevity needs the shared layers.</aside>
 </section>
 
-<section class="slide" data-title="Why the docs outrank the code" data-anim="larkc" data-view="larkcode">
+<section class="slide" data-title="Why the docs outrank the code" data-anim="docsc" data-view="docscode">
   <div class="kicker h">Part 1 · Team docs</div>
   <h2 class="h">Why the docs outrank the code</h2>
   <svg class="ov x" width="1600" height="900">
@@ -243,8 +243,8 @@ a.box:hover { border-color: var(--after); }
   <aside class="notes">The code and the doc will disagree sometimes. When they do, one of them has to be the reference. If it is the code, every bug quietly becomes the spec, and nothing is left to argue with. With the team docs as the reference, a mismatch becomes a question: is the doc wrong, or the code? Either answer is a fix. The doc earns that place for a few reasons. It holds intent: the designer drafts the design there first, and the code is one attempt at it. A check has to sit outside the thing it checks; code cannot tell you it is wrong, and tests only tell you it matches the tests. And with agents, code is cheap: a feature is rewritten in an hour and branches are rebuilt all week, while the doc changes slowly, under a person's review. When building gets fast, deciding what to build is the slow part, so that is what gets anchored. It also outlives any one person, and it answers questions without anyone having to ask the author; other teams, product people and an agent with no memory can all read it. The limit is real. The team docs say what should happen; only running code says what does. Each is first for its own question, which is why the next slide ends with running it. The footer is the price: a stale doc is worse than none, so it changes in the same PR as the code. How it stays usable: it holds the current contract with no history, it is written in plain English, agents edit one block at a time, and the tools use the user's own login.</aside>
 </section>
 
-<section class="slide" data-title="Consistency" data-anim="consist" data-view="larkIn">
-  <div class="kicker h">Part 1 · Inside Lark</div>
+<section class="slide" data-title="Consistency" data-anim="consist" data-view="docsIn">
+  <div class="kicker h">Part 1 · Inside the docs</div>
   <h2 class="h">Consistency is the test</h2>
   <div class="x">
     <div class="doc dc" style="left:200px; top:280px"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div class="t">API contract</div><div class="s">REST · WebSocket</div></div></div>
@@ -277,7 +277,7 @@ a.box:hover { border-color: var(--after); }
     <p class="p" id="consistPoint" style="left:220px; top:712px; width:1160px; font-size:24px; color:var(--fg-2)">When the layers agree, trust them by default. When they disagree, you know exactly where to look.</p>
     <p class="p" id="consistSub" style="left:220px; top:760px; width:1160px; font-size:18px; color:var(--muted)">The rare case where they agree and are both wrong is what running it catches.</p>
   </div>
-  <aside class="notes">Inside Lark there are several documents that describe the same system from different sides: the API contract, a resource doc, the data model and the load-test results. They must agree with each other, and they must agree with the deployed code. When I check consistency, I compare the documents with each other first. This found a real drift: an event in the API contract still used old field names, such as storeId, while the resource doc and the code had moved to storeIds. It had been wrong for months. Nobody found it by reading the code. It showed up because two documents disagreed. So consistency is the everyday check, and the main signal I use for judgement: it is cheap, it runs all the time, and when two layers disagree it points at the exact place to look. Its one blind spot is a gap the layers share: if they agree and are both wrong, nothing disagrees. That rare case is why the deck also runs things, and the next slide shows one.</aside>
+  <aside class="notes">Inside the team docs there are several documents that describe the same system from different sides: the API contract, a resource doc, the data model and the load-test results. They must agree with each other, and they must agree with the deployed code. When I check consistency, I compare the documents with each other first. This found a real drift: an event in the API contract still used old field names, such as storeId, while the resource doc and the code had moved to storeIds. It had been wrong for months. Nobody found it by reading the code. It showed up because two documents disagreed. So consistency is the everyday check, and the main signal I use for judgement: it is cheap, it runs all the time, and when two layers disagree it points at the exact place to look. Its one blind spot is a gap the layers share: if they agree and are both wrong, nothing disagrees. That rare case is why the deck also runs things, and the next slide shows one.</aside>
 </section>
 
 <section class="slide" data-title="It starts with a draft" data-anim="loop" data-view="loop">
@@ -285,16 +285,16 @@ a.box:hover { border-color: var(--after); }
   <h2 class="h">It starts with a draft</h2>
   <div class="p" style="left:920px; top:212px; width:600px; display:flex; flex-direction:column; gap:11px">
     <div class="small mono sth">the fast loop · ① draft and build</div>
-    <div class="step st" data-node="lark"><span class="n">1</span><span class="t">The designer drafts the base design</span><span class="tag">LARK</span></div>
-    <div class="step st" data-node="lark"><span class="n">2</span><span class="t">An agent polishes it</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="docs"><span class="n">1</span><span class="t">The designer drafts the base design</span><span class="tag">DOCS</span></div>
+    <div class="step st" data-node="docs"><span class="n">2</span><span class="t">An agent polishes it</span><span class="tag">DOCS</span></div>
     <div class="step st" data-node="code"><span class="n">3</span><span class="t">Code built against the draft</span><span class="tag">CODE</span></div>
     <div class="small mono sth" style="margin-top:8px">② check and question</div>
-    <div class="step st" data-node="lark"><span class="n">4</span><span class="t">A routes doc lists one entity type, not its variants</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="docs"><span class="n">4</span><span class="t">A routes doc lists one entity type, not its variants</span><span class="tag">DOCS</span></div>
     <div class="step st" data-node="vault"><span class="n">5</span><span class="t">History: written before variants</span><span class="tag">VAULT</span></div>
     <div class="step st" data-node="code"><span class="n">6</span><span class="t">Doc and code had the same gap; running it found it</span><span class="tag">CODE</span></div>
-    <div class="step st" data-node="lark"><span class="n">7</span><span class="t">Build, verify, update the doc</span><span class="tag">LARK</span></div>
+    <div class="step st" data-node="docs"><span class="n">7</span><span class="t">Build, verify, update the doc</span><span class="tag">DOCS</span></div>
   </div>
-  <aside class="notes">The loop starts with a person's draft, and an agent polishes the presentation: the structure, the wording and the diagrams. Only after that come the questions and the consistency checks. Here is a real one, and it is the rare case from the last slide: the doc and the code shared the same gap. A routes doc listed one entity type and not its variants. The vault notes and the document history showed why: those sections were written before variants existed. And the code had the same gap. The layers agreed, so nothing pointed at it; running it found it. Then I built the routes, had them reviewed and pushed, deployed them to staging and checked them there. The last step is to update the Lark page, so the layers agree again, and this time they are right. The loop always ends back in Lark.</aside>
+  <aside class="notes">The loop starts with a person's draft, and an agent polishes the presentation: the structure, the wording and the diagrams. Only after that come the questions and the consistency checks. Here is a real one, and it is the rare case from the last slide: the doc and the code shared the same gap. A routes doc listed one entity type and not its variants. The vault notes and the document history showed why: those sections were written before variants existed. And the code had the same gap. The layers agreed, so nothing pointed at it; running it found it. Then I built the routes, had them reviewed and pushed, deployed them to staging and checked them there. The last step is to update the team doc, so the layers agree again, and this time they are right. The loop always ends back in the docs.</aside>
 </section>
 
 <section class="slide" data-title="Vault" data-view="vault">
@@ -303,7 +303,7 @@ a.box:hover { border-color: var(--after); }
   <div class="p" style="left:660px; top:212px; width:860px; display:flex; flex-direction:column; gap:16px">
     <div class="note a">
       <div class="small mono" style="margin-bottom:6px">vault note · scope</div>
-      <div class="q">“Scope comes from the Lark page.” <span class="small">(the opening story)</span></div>
+      <div class="q">“Scope comes from the team doc.” <span class="small">(the opening story)</span></div>
       <div class="r">If the source doc is not in context, ask for it before you write code.</div>
     </div>
     <div class="note a">
@@ -313,12 +313,12 @@ a.box:hover { border-color: var(--after); }
     </div>
     <div class="a" style="display:grid; grid-template-columns: 1.35fr 1fr; gap:16px; margin-top:4px">
       <div class="card" style="padding:16px 20px; border-color:var(--after)"><div class="small mono after" style="margin-bottom:10px">✓ IN</div><span class="chipi">decisions</span><span class="chipi">reversals</span><span class="chipi">accepted risks</span><span class="chipi">pitfalls</span></div>
-      <div class="card" style="padding:16px 20px"><div class="small mono" style="margin-bottom:10px">✕ OUT</div><div style="font-size:19px; color:var(--fg-2)">Current state. It belongs in Lark and in the code.</div></div>
+      <div class="card" style="padding:16px 20px"><div class="small mono" style="margin-bottom:10px">✕ OUT</div><div style="font-size:19px; color:var(--fg-2)">Current state. It belongs in the team docs and in the code.</div></div>
     </div>
     <div class="small a" style="margin-top:2px">Recorded when it matters, recalled before acting.</div>
     <div class="small a" style="margin-top:-8px"><span class="after">↳</span> No vault? Keep a Decisions section at the bottom of the doc page, or put it in the PR description.</div>
   </div>
-  <aside class="notes">The vault is an Obsidian vault of short notes about decisions. Decisions are recorded when they matter, which depends on someone remembering to do it, and recalled before acting. It is a record of reasoning, not documentation of the current state. Two real examples. The first is the note from the opening story; the rule that came out of it is to ask for the source document before writing code, if it is not in context. In the second, a design for how a PATCH changes a record's store scope was reversed within a day after review. The fix was folded into the original commits, so git history only shows the new rule. Without the note, the reason would be lost. What goes in: decisions, reversals, accepted risks and pitfalls. What stays out: the current state, which belongs in Lark and in the code. If a team has no vault, a Decisions section at the bottom of the doc page, or the PR description, does the same job.</aside>
+  <aside class="notes">The vault is an Obsidian vault of short notes about decisions. Decisions are recorded when they matter, which depends on someone remembering to do it, and recalled before acting. It is a record of reasoning, not documentation of the current state. Two real examples. The first is the note from the opening story; the rule that came out of it is to ask for the source document before writing code, if it is not in context. In the second, a design for how a PATCH changes a record's store scope was reversed within a day after review. The fix was folded into the original commits, so git history only shows the new rule. Without the note, the reason would be lost. What goes in: decisions, reversals, accepted risks and pitfalls. What stays out: the current state, which belongs in the team docs and in the code. If a team has no vault, a Decisions section at the bottom of the doc page, or the PR description, does the same job.</aside>
 </section>
 
 <section class="slide" data-title="Read on demand" data-anim="ondemand" data-view="memsess">
@@ -334,10 +334,10 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
       <pre class="code" style="margin-top:8px; font-size:14px">- [<span class="f">Commit messages: short and factual</span>](feedback_commit_message_brevity.md) — one-line subject, no verbose body or self-justification
 …</pre></div></div>
     <div class="load a"><span class="n">4</span><div class="t">Vault notes <span>· by search</span></div></div>
-    <div class="load a"><span class="n">5</span><div class="t">Lark pages <span>· by link</span></div></div>
+    <div class="load a"><span class="n">5</span><div class="t">Team doc pages <span>· by link</span></div></div>
     <p class="a" style="font-size:24px; color:var(--fg); margin-top:6px">Small, linked pieces beat one big document.</p>
   </div>
-  <aside class="notes">A session does not load everything. It starts from CLAUDE.md, which is short and mostly links. The rules files are loaded only when a task touches them, and when two of them conflict the order is fixed: the constitution, then security, then the service conventions, then the pattern guides. The memory index has one line per fact, and each line links to a file with the detail, so the session reads the line and opens the file only when it matters. Vault notes are found by search, and Lark pages are opened by link. The result is that each task carries only the context it needs. Small, linked pieces work better than one big document, because a big document is either loaded whole or not at all.</aside>
+  <aside class="notes">A session does not load everything. It starts from CLAUDE.md, which is short and mostly links. The rules files are loaded only when a task touches them, and when two of them conflict the order is fixed: the constitution, then security, then the service conventions, then the pattern guides. The memory index has one line per fact, and each line links to a file with the detail, so the session reads the line and opens the file only when it matters. Vault notes are found by search, and team doc pages are opened by link. The result is that each task carries only the context it needs. Small, linked pieces work better than one big document, because a big document is either loaded whole or not at all.</aside>
 </section>
 
 <section class="slide" data-title="Links, not names" data-anim="links" data-view="links">
@@ -349,7 +349,7 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
     <path class="sa lkl" d="M1000 624 C 880 720, 400 720, 200 626" data-c="#5ab4e8" data-w="2"/>
     <path class="sa lkl" d="M150 590 C 96 500, 96 360, 170 272" data-c="#5ab4e8" data-w="2"/>
   </svg>
-  <div class="lchip lc" style="left:668px; top:228px">▤ Lark page</div>
+  <div class="lchip lc" style="left:668px; top:228px">▤ team doc</div>
   <div class="lchip lc" style="left:960px; top:590px">◆ vault note</div>
   <div class="lchip lc" style="left:136px; top:592px">⑂ PR</div>
   <div class="lchip lc" style="left:150px; top:236px">◎ Jira issue</div>
@@ -363,10 +363,10 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
     <div class="small" style="margin-top:6px"><span class="before">✕</span> nothing to follow</div>
   </div>
   <p class="p a" style="left:1110px; top:480px; width:410px; font-size:24px; color:var(--fg)">Connected context is robust context.</p>
-  <aside class="notes">Every reference I write is a real link: the pull request URL instead of a bare number like #1234, the Lark wiki link instead of "the API doc", the Jira issue link instead of "the ticket", and commit links. A link can be followed by a person or by an agent. A bare number or a name cannot: the reader has to guess which repository, which page, which ticket. On the map, the links tie the layers together: a Lark page points to the PR, the PR points to the Jira issue, the vault note points to both. The note on the right has the same information as names only, and nothing in it can be followed. Connected context is robust context.</aside>
+  <aside class="notes">Every reference I write is a real link: the pull request URL instead of a bare number like #1234, the wiki link instead of "the API doc", the Jira issue link instead of "the ticket", and commit links. A link can be followed by a person or by an agent. A bare number or a name cannot: the reader has to guess which repository, which page, which ticket. On the map, the links tie the layers together: a team doc points to the PR, the PR points to the Jira issue, the vault note points to both. The note on the right has the same information as names only, and nothing in it can be followed. Connected context is robust context.</aside>
 </section>
 
-<section class="slide" data-title="Say it once" data-anim="once" data-view="lark">
+<section class="slide" data-title="Say it once" data-anim="once" data-view="docs">
   <div class="kicker h">Part 1 · Connectivity</div>
   <h2 class="h">Say it once, link it everywhere</h2>
   <svg class="ov x" width="1600" height="900">
@@ -383,12 +383,12 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
     </div>
     <div class="small a" style="margin-top:8px"><span class="before">- - -</span> the copies drift apart</div>
   </div>
-  <div class="p small mono a" style="left:920px; top:520px"><span class="after">✓</span> said once, in Lark</div>
+  <div class="p small mono a" style="left:920px; top:520px"><span class="after">✓</span> said once, in the docs</div>
   <div class="lchip ch" style="left:920px; top:556px">PR body · link</div>
   <div class="lchip ch" style="left:920px; top:626px">code comment · link</div>
   <div class="lchip ch" style="left:920px; top:696px">Jira ticket · link</div>
   <p class="p small a" style="left:760px; top:772px; width:760px; font-size:15px">“Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.” Hunt and Thomas, <i>The Pragmatic Programmer</i></p>
-  <aside class="notes">The long explanation lives once, in Lark. Code comments, PR descriptions and Jira tickets stay short and link to it. They do not explain it again. When the same paragraph is pasted into a PR, a comment and a ticket, the three copies drift apart as each one is edited on its own, and a reader cannot tell which one is right. With one Lark section and three short links, there is nothing to drift. The structure also carries meaning: where a piece of writing lives tells the reader what it is. A Lark page is the contract, a PR body is the change, a vault note is the reason. This is the DRY principle from Andrew Hunt and David Thomas, The Pragmatic Programmer, Addison-Wesley, 1999: "Every piece of knowledge must have a single, unambiguous, authoritative representation within a system." It also matches the Diátaxis framework by Daniele Procida, which keeps explanation and reference apart.</aside>
+  <aside class="notes">The long explanation lives once, in the team docs. Code comments, PR descriptions and Jira tickets stay short and link to it. They do not explain it again. When the same paragraph is pasted into a PR, a comment and a ticket, the three copies drift apart as each one is edited on its own, and a reader cannot tell which one is right. With one doc section and three short links, there is nothing to drift. The structure also carries meaning: where a piece of writing lives tells the reader what it is. A team doc is the contract, a PR body is the change, a vault note is the reason. This is the DRY principle from Andrew Hunt and David Thomas, The Pragmatic Programmer, Addison-Wesley, 1999: "Every piece of knowledge must have a single, unambiguous, authoritative representation within a system." It also matches the Diátaxis framework by Daniele Procida, which keeps explanation and reference apart.</aside>
 </section>
 
 <section class="slide" data-title="Four phases" data-anim="loops2" data-view="code">
@@ -396,16 +396,16 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
   <h2 class="h">Four phases, one loop inside each</h2>
   <p class="p lq" style="left:360px; top:206px; font-size:38px; font-weight:600; color:var(--fg)">“Make it work, make it right, make it fast.”</p>
   <p class="p small lqk" style="left:360px; top:264px; font-size:16px">Kent Beck · with one step in front: design it</p>
-  <div class="p card ph" style="left:360px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#cc79a7; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#cc79a7">1</span><span style="font-size:22px; font-weight:600">Design it</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">a person drafts the base design in Lark</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
+  <div class="p card ph" style="left:360px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#cc79a7; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#cc79a7">1</span><span style="font-size:22px; font-weight:600">Design it</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">a person drafts the base design in the team docs</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
   <div class="p pha" style="left:632px; top:418px; font-size:22px; color:var(--slate)">→</div>
   <div class="p card ph" style="left:656px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">2</span><span style="font-size:22px; font-weight:600">Make it work</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">features built against the draft</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
   <div class="p pha" style="left:928px; top:418px; font-size:22px; color:var(--slate)">→</div>
   <div class="p card ph" style="left:952px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">3</span><span style="font-size:22px; font-weight:600">Make it right</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">structure, refactors, tests</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
   <div class="p pha" style="left:1224px; top:418px; font-size:22px; color:var(--slate)">→</div>
   <div class="p card ph" style="left:1248px; top:360px; width:268px; height:150px; padding:16px 18px; border-color:#8796ad; border-width:2px"><div style="display:flex; align-items:center; gap:10px"><span class="mono" style="font-size:15px; color:#8796ad">4</span><span style="font-size:22px; font-weight:600">Make it fast</span></div><div style="font-size:16px; color:var(--fg-2); margin-top:10px; line-height:1.35">measure under load, change what the numbers show</div><div style="margin-top:12px"><svg class="cyc" width="22" height="22" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg></div></div>
-  <div class="p tll" style="left:360px; top:546px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--fg-2)"><svg width="26" height="26" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg><span><b style="color:var(--after)">the fast loop</b>, inside every phase: draft → polish → build → check → questions → update Lark</span></div>
+  <div class="p tll" style="left:360px; top:546px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--fg-2)"><svg width="26" height="26" viewBox="0 0 20 20" style="flex:none"><circle cx="10" cy="10" r="7" fill="none" stroke="#5ab4e8" stroke-width="2" stroke-dasharray="30 14"/><path d="M15 3 L17.5 6.5 L13.5 7" fill="none" stroke="#5ab4e8" stroke-width="2"/></svg><span><b style="color:var(--after)">the fast loop</b>, inside every phase: draft → polish → build → check → questions → update the docs</span></div>
   <p class="p tlp" style="left:360px; top:620px; width:1160px; font-size:23px; color:var(--fg)">The order matters: tuning before the structure settles tunes code that is about to change.</p>
-  <aside class="notes">Part 2 is about how changes ship, and it starts with a phrase attributed to Kent Beck: make it work, make it right, make it fast. I put one step in front of it: design it. So the work moves through four phases. Design it: a person drafts the base design in Lark. Make it work: the features are built against that draft. Make it right: structure, refactors and tests that find bugs early. Make it fast: measure under load, and change only what the numbers show. These phases overlap in practice. Inside every phase, the fast loop from Part 1 turns many times: draft, polish, build, check, questions, update Lark. The order matters. If you tune before the structure settles, you tune code that is about to change. Later slides map onto it: the refactors slide is make it right, and the evidence slide is make it fast.</aside>
+  <aside class="notes">Part 2 is about how changes ship, and it starts with a phrase attributed to Kent Beck: make it work, make it right, make it fast. I put one step in front of it: design it. So the work moves through four phases. Design it: a person drafts the base design in the team docs. Make it work: the features are built against that draft. Make it right: structure, refactors and tests that find bugs early. Make it fast: measure under load, and change only what the numbers show. These phases overlap in practice. Inside every phase, the fast loop from Part 1 turns many times: draft, polish, build, check, questions, update the docs. The order matters. If you tune before the structure settles, you tune code that is about to change. Later slides map onto it: the refactors slide is make it right, and the evidence slide is make it fast.</aside>
 </section>
 
 <section class="slide" data-title="Code shape" data-anim="shape" data-view="code">
@@ -449,7 +449,7 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
     </div>
     <p class="p shp" style="left:360px; top:790px; width:1160px; font-size:22px; color:var(--fg)">Structure is checked by tools, so review can focus on intent.</p>
   </div>
-  <aside class="notes">Besides checking the code against Lark, I check the code as a whole by its structure, not line by line. A layering refactor gave the service one direction of calls: routes, then controllers, then the SDK services, then repositories, then the database. oxlint, a fast linter, holds those layers: a lower layer cannot import a service, the SDK cannot import the service that hosts it, folders import each other by alias so the rules can see the import, and other services can only import the SDK entry point. Reaching into its folders, for example a repository, is a lint error with the message you see. The SDK has one door in, exports only named functions, never hands out a raw database handle, and every repository takes a criteria object with the client id in it, so tenancy is part of every key: the line under that heading is the where-clause. Then there are tests that guard the structure rather than the behaviour: a tenancy-scope test over every query, a test of the SDK boundary, and round-trip tests that count queries and pool checkouts per call. Because tools check the structure, a reviewer can spend the time on intent. Excerpts adapted from production code; names generalised.</aside>
+  <aside class="notes">Besides checking the code against the docs, I check the code as a whole by its structure, not line by line. A layering refactor gave the service one direction of calls: routes, then controllers, then the SDK services, then repositories, then the database. oxlint, a fast linter, holds those layers: a lower layer cannot import a service, the SDK cannot import the service that hosts it, folders import each other by alias so the rules can see the import, and other services can only import the SDK entry point. Reaching into its folders, for example a repository, is a lint error with the message you see. The SDK has one door in, exports only named functions, never hands out a raw database handle, and every repository takes a criteria object with the client id in it, so tenancy is part of every key: the line under that heading is the where-clause. Then there are tests that guard the structure rather than the behaviour: a tenancy-scope test over every query, a test of the SDK boundary, and round-trip tests that count queries and pool checkouts per call. Because tools check the structure, a reviewer can spend the time on intent. Excerpts adapted from production code; names generalised.</aside>
 </section>
 
 <section class="slide" data-title="Why refactors matter" data-anim="refactor" data-view="code">
@@ -559,7 +559,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     <rect id="gate" x="1166" y="226" width="16" height="300" rx="5" fill="#1a2540" stroke="#94a3b8" stroke-width="2"/>
   </svg>
   <div class="x">
-    <div class="lane agl" style="top:248px">Lark edits</div>
+    <div class="lane agl" style="top:248px">Doc edits</div>
     <div class="lane agl" style="top:324px">review drafts</div>
     <div class="lane agl" style="top:400px">research</div>
     <div class="lane agl" style="top:476px">builds</div>
@@ -569,7 +569,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     </div>
     <div class="p agt" style="left:600px; top:650px; width:920px; font-size:22px; color:var(--fg-2); line-height:1.5">Background agents work in parallel. Anything outward-facing waits at the gate.</div>
   </div>
-  <aside class="notes">Most of the work runs in background agents, side by side: one edits a Lark page block by block, one drafts a review of a diff for a person to judge, one researches, one runs builds and tests. I do not wait for each in turn. But nothing that faces outward happens without me. A push, a deploy, a force-push or publishing a document all stop at a gate, and a person approves each one. Agents can do the work. The decision to make it visible to others stays with a person.</aside>
+  <aside class="notes">Most of the work runs in background agents, side by side: one edits a team doc block by block, one drafts a review of a diff for a person to judge, one researches, one runs builds and tests. I do not wait for each in turn. But nothing that faces outward happens without me. A push, a deploy, a force-push or publishing a document all stop at a gate, and a person approves each one. Agents can do the work. The decision to make it visible to others stays with a person.</aside>
 </section>
 
 <section class="slide" data-title="Running it" data-anim="running" data-view="code">
@@ -578,7 +578,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   <div class="p card qf" style="left:360px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">◎ Jira scenario</div><div class="small" style="font-size:14px; margin-top:6px">written by a person</div></div>
   <div class="p card qf" style="left:640px; top:200px; width:320px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">⇆ test scenario</div><div class="small" style="font-size:14px; margin-top:6px">agent drafts · person reviews</div></div>
   <div class="p card qf" style="left:990px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">▶ run on staging</div><div class="small" style="font-size:14px; margin-top:6px">Bruno · Playwright · k6</div></div>
-  <div class="p card qf" style="left:1270px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">= vs Lark contract</div><div class="small" style="font-size:14px; margin-top:6px">the result is checked</div></div>
+  <div class="p card qf" style="left:1270px; top:200px; width:250px; height:92px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:18px; color:var(--fg)">= vs API contract</div><div class="small" style="font-size:14px; margin-top:6px">the result is checked</div></div>
   <div class="p qfa" style="left:614px; top:226px; font-size:22px; color:var(--slate)">→</div>
   <div class="p qfa" style="left:964px; top:226px; font-size:22px; color:var(--slate)">→</div>
   <div class="p qfa" style="left:1244px; top:226px; font-size:22px; color:var(--slate)">→</div>
@@ -588,7 +588,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   <div class="p qb" style="left:1170px; top:352px; font-size:15px; color:var(--muted)"><span class="after">✓</span> runs before every push</div>
   <div class="p qr" style="left:360px; top:414px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
   <div class="p qr" style="left:360px; top:434px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">↻ smoke</span></div>
-  <div class="p qt" style="left:510px; top:422px; width:520px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">⇆</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Bruno</div><div style="font-size:13px; color:var(--muted); line-height:1.25">API collections vs the Lark contract</div></div></div>
+  <div class="p qt" style="left:510px; top:422px; width:520px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">⇆</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Bruno</div><div style="font-size:13px; color:var(--muted); line-height:1.25">API collections vs the API contract</div></div></div>
   <div class="p qb" style="left:1170px; top:422px; width:350px; height:56px; border:2px dashed var(--before); background:var(--before-soft); border-radius:10px; padding:6px 12px"><div style="font-size:15px; color:var(--fg)"><span class="before">⚠</span> Pods restarted under load</div><div style="font-size:13px; color:var(--muted)">tiny CPU request, health check timed out</div></div>
   <div class="p qr" style="left:360px; top:498px; width:1160px; height:72px; border-top:1px solid #22304c"></div>
   <div class="p qr" style="left:360px; top:518px; width:140px"><span class="mono" style="font-size:17px; color:var(--after)">⇄ end to end</span></div>
@@ -599,10 +599,10 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   <div class="p qt" style="left:510px; top:590px; width:250px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">≋</span><div><div class="mono" style="font-size:15px; color:var(--fg)">k6</div><div style="font-size:13px; color:var(--muted); line-height:1.25">realistic and 3× load</div></div></div>
   <div class="p qt" style="left:772px; top:590px; width:390px; height:56px; border:1px solid var(--after); background:#0e1a30; border-radius:10px; padding:6px 12px; display:flex; gap:10px; align-items:center"><span style="color:var(--after); font-size:20px">◔</span><div><div class="mono" style="font-size:15px; color:var(--fg)">Grafana · Jaeger · Pyroscope</div><div style="font-size:13px; color:var(--muted); line-height:1.25">where the time goes</div></div></div>
   <div class="p qb" style="left:1170px; top:590px; width:350px; height:56px; border:2px dashed var(--before); background:var(--before-soft); border-radius:10px; padding:6px 12px"><div style="font-size:15px; color:var(--fg)"><span class="before">⚠</span> Fast commit, slow response</div><div style="font-size:13px; color:var(--muted)">found only by reading server logs</div></div>
-  <aside class="notes">Agents run the tools. The tools produce the evidence. People judge it. The main flow starts in Jira: a person writes the test scenarios there, an agent drafts the Bruno collections and the other test scenarios from them, and the person reviews them. They run against staging, and the result is checked against the Lark contract. The tools sit in tiers. Unit and database tests, with vitest and real Postgres suites, check the query count and the connection checkouts per call, and run before every push. Bruno runs API collections against staging and checks each endpoint against the Lark contract. Playwright drives the real UI screens end to end, for example a live edit that must show up in the preview. k6 puts load on it at realistic and three times realistic levels, and Grafana, Jaeger and Pyroscope show where the time goes. Each tier found a bug that the others could not. Smoke: pods restarted under load, because they inherited a tiny CPU request and the health check timed out. End to end: push messages were never sent when deployed, because the deployed boot path never started the WebSocket server; it worked locally and was found by running the real boot on a cluster. Performance: the commit was fast but the response was slow, which showed up only when the load tool's numbers were checked against the server logs. Other finds from the same runs: a 30-second smoke check before a long run stops an hour of bad numbers; events silently never arrived on a Redis cluster because a client option was missing; and the browser client listened on old channel names after a rename.</aside>
+  <aside class="notes">Agents run the tools. The tools produce the evidence. People judge it. The main flow starts in Jira: a person writes the test scenarios there, an agent drafts the Bruno collections and the other test scenarios from them, and the person reviews them. They run against staging, and the result is checked against the API contract. The tools sit in tiers. Unit and database tests, with vitest and real Postgres suites, check the query count and the connection checkouts per call, and run before every push. Bruno runs API collections against staging and checks each endpoint against the API contract. Playwright drives the real UI screens end to end, for example a live edit that must show up in the preview. k6 puts load on it at realistic and three times realistic levels, and Grafana, Jaeger and Pyroscope show where the time goes. Each tier found a bug that the others could not. Smoke: pods restarted under load, because they inherited a tiny CPU request and the health check timed out. End to end: push messages were never sent when deployed, because the deployed boot path never started the WebSocket server; it worked locally and was found by running the real boot on a cluster. Performance: the commit was fast but the response was slow, which showed up only when the load tool's numbers were checked against the server logs. Other finds from the same runs: a 30-second smoke check before a long run stops an hour of bad numbers; events silently never arrived on a Redis cluster because a client option was missing; and the browser client listened on old channel names after a rename.</aside>
 </section>
 
-<section class="slide" data-title="Evidence" data-anim="evidence" data-view="codelark">
+<section class="slide" data-title="Evidence" data-anim="evidence" data-view="codedocs">
   <div class="kicker h">Part 3 · Agents and evidence · <span class="tag" style="font-size:14px; letter-spacing:.06em">make it fast</span></div>
   <h2 class="h">Evidence over opinion</h2>
   <div class="p" style="left:960px; top:205px; width:560px; display:flex; flex-direction:column; gap:16px">
@@ -626,7 +626,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       </div>
     </div>
   </div>
-  <aside class="notes">Claims about performance need numbers we can trace. The load levels came from production data: the busiest minute in 14 days of production data had about 19 line items a second, so the realistic level is 20 writes a second, and high stress is three times that. Then the tools must agree. Before trusting k6, I checked its counts against the server logs: 2,497 writes in k6 and 2,497 in the logs, and 7,404 against 7,404, and the Grafana panels matched k6. One tool alone is not trusted. And the write-ups say plainly what failed and what we did not measure, so nobody reads more into the results than they show. This is the code to Lark arrow: the evidence goes back into the published layer.</aside>
+  <aside class="notes">Claims about performance need numbers we can trace. The load levels came from production data: the busiest minute in 14 days of production data had about 19 line items a second, so the realistic level is 20 writes a second, and high stress is three times that. Then the tools must agree. Before trusting k6, I checked its counts against the server logs: 2,497 writes in k6 and 2,497 in the logs, and 7,404 against 7,404, and the Grafana panels matched k6. One tool alone is not trusted. And the write-ups say plainly what failed and what we did not measure, so nobody reads more into the results than they show. This is the code to docs arrow: the evidence goes back into the published layer.</aside>
 </section>
 
 <section class="slide" data-title="Where it still breaks" data-anim="breaks" data-view="sessL">
@@ -650,7 +650,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   <div class="p card wbC" style="left:1074px; top:420px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">CI quietly skipped a whole stack of PRs.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: a person noticed.</div></div>
   <div class="p card wbC" style="left:1074px; top:528px; width:410px; height:100px; padding:12px 14px; border:2px dashed var(--before)"><div style="display:flex; gap:8px"><span class="before">⚠</span><span style="font-size:17px; line-height:1.3">A replay was proven the same, but not right.</span></div><div class="small" style="font-size:14px; margin-top:6px; padding-left:24px">Caught: the tests failed.</div></div>
   <p class="p wbT" style="left:620px; top:664px; width:880px; font-size:23px; line-height:1.4; color:var(--fg)">The work in the middle is solid. The slips happen around it, and a person catches most of them.</p>
-  <aside class="notes">This slide is about where the work still goes wrong. Think of the work as a bar. The solid middle is the work itself: building, testing and reviewing, and agents are fast and thorough there. The frayed edges are where the work touches the outside world: setting up the environment and the tools at the start, and handing off at the end, which means publishing and bookkeeping. Six real slips, three at each edge. Setting up first. A local app started on a port that the login service refuses, and the login bounced. The load-test harness had bugs and gave misleading numbers for a day: a per-worker counter skewed the writes, fan-out to one client produced a fake 22-second median, and a cap on virtual users held the load down. Someone questioned that 22 seconds was too long, and the harness was fixed. And a load-test log stream dropped, so one run was lost, which showed as a gap in the results. Then handing off. A Lark doc edit landed on the wrong page, and a person noticed it. CI silently did not run for a whole stack, because of a dependency conflict lower down, until a person noticed. And a replay proved the change was the same but not that it was right: type errors in test files slipped past the patch checks and were caught by the tests. The work in the middle is solid. The slips happen around it, and a person catches most of them.</aside>
+  <aside class="notes">This slide is about where the work still goes wrong. Think of the work as a bar. The solid middle is the work itself: building, testing and reviewing, and agents are fast and thorough there. The frayed edges are where the work touches the outside world: setting up the environment and the tools at the start, and handing off at the end, which means publishing and bookkeeping. Six real slips, three at each edge. Setting up first. A local app started on a port that the login service refuses, and the login bounced. The load-test harness had bugs and gave misleading numbers for a day: a per-worker counter skewed the writes, fan-out to one client produced a fake 22-second median, and a cap on virtual users held the load down. Someone questioned that 22 seconds was too long, and the harness was fixed. And a load-test log stream dropped, so one run was lost, which showed as a gap in the results. Then handing off. A doc edit landed on the wrong page, and a person noticed it. CI silently did not run for a whole stack, because of a dependency conflict lower down, until a person noticed. And a replay proved the change was the same but not that it was right: type errors in test files slipped past the patch checks and were caught by the tests. The work in the middle is solid. The slips happen around it, and a person catches most of them.</aside>
 </section>
 
 <section class="slide" data-title="Judgement" data-anim="judge" data-view="sessL">
@@ -673,8 +673,8 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
 <section class="slide" data-title="Monday list" data-anim="monday" data-view="home">
   <div class="kicker h">Summary</div>
   <h2 class="h">Try this on Monday</h2>
-  <div class="p card mc" data-node="lark" style="left:900px; top:212px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">1</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div style="font-size:25px; font-weight:600">Docs are the contract</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Docs say what should happen; running code says what does. Change both in the same PR.</div></div></div>
-  <div class="p card mc" data-node="lark" style="left:900px; top:362px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">2</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div><div><div style="font-size:25px; font-weight:600">Link, don’t name</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Every reference is a link. Long text lives in one place.</div></div></div>
+  <div class="p card mc" data-node="docs" style="left:900px; top:212px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">1</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M5 3h10l4 4v14H5z"/><path d="M8 11h8M8 15h8"/></svg></div><div><div style="font-size:25px; font-weight:600">Docs are the contract</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Docs say what should happen; running code says what does. Change both in the same PR.</div></div></div>
+  <div class="p card mc" data-node="docs" style="left:900px; top:362px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">2</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div><div><div style="font-size:25px; font-weight:600">Link, don’t name</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Every reference is a link. Long text lives in one place.</div></div></div>
   <div class="p card mc" data-node="sessions" style="left:900px; top:512px; width:620px; height:132px; padding:16px 22px; display:flex; gap:18px; align-items:center"><div class="mono" style="font-size:44px; font-weight:700; color:var(--after); width:40px">3</div><div class="ico" style="width:52px; height:52px"><svg viewBox="0 0 24 24" style="width:30px; height:30px; stroke:#cbd5e1"><rect x="10" y="3" width="4" height="18" rx="1"/><path d="M3 12h5M16 12h5M18 9l3 3-3 3"/></svg></div><div><div style="font-size:25px; font-weight:600">People judge</div><div style="font-size:17px; color:var(--fg-2); margin-top:6px; line-height:1.35">Nothing goes outward without a person. Trust a number only after a second tool agrees.</div></div></div>
   <div class="p mq" style="left:900px; top:680px; font-size:52px; font-weight:700">Questions?</div>
   <aside class="notes">If you take three things into Monday, take these. One: docs are the contract. Docs say what should happen, and running code says what does. Change both in the same PR. Two: every reference is a link, and long text lives in one place. Three: people judge. Nothing goes outward without a person, and you trust a number only after a second tool agrees. Thank you. Questions? The last slide is an appendix: what you need to try this.</aside>
@@ -692,8 +692,8 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     <path class="sa sul" d="M898 721 L880 721" data-c="#5ab4e8" data-w="2"/>
     <path class="sa sul" d="M690 668 C 720 640, 735 600, 740 561" data-c="#5ab4e8" data-w="2.5"/>
   </svg>
-  <div class="lchip su" style="left:900px; top:272px"><span style="color:var(--after)">⌘</span> lark-cli · own auth</div>
-  <div class="lchip su" style="left:900px; top:314px"><span style="color:var(--after)">◇</span> lark skills · a Lark agent</div>
+  <div class="lchip su" style="left:900px; top:272px"><span style="color:var(--after)">⌘</span> docs CLI · own auth</div>
+  <div class="lchip su" style="left:900px; top:314px"><span style="color:var(--after)">◇</span> docs skills · a docs agent</div>
   <div class="lchip su" style="left:470px; top:214px"><span style="color:var(--after)">◎</span> Jira · tracking</div>
   <div class="lchip su" style="right:1188px; top:430px"><span style="color:var(--after)">⑂</span> gh · gh-stack</div>
   <div class="lchip su" style="right:1188px; top:472px"><span style="color:var(--after)">⎇</span> git worktrees · one per PR</div>
@@ -705,7 +705,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   <div class="lchip su" style="left:900px; top:704px"><span style="color:var(--after)">▤</span> file memory · index + one fact per file</div>
   <div class="p card su" style="left:430px; top:648px; width:260px; padding:12px 16px; border-color:var(--after)"><div class="mono" style="font-size:15px; color:var(--after)">▣ team skills pack</div><div style="font-size:13px; line-height:1.4; color:var(--fg-2); margin-top:6px">architecture overview · logs · databases · metrics · code quality</div></div>
   <p class="p su" style="left:96px; top:790px; font-size:24px; color:var(--fg)">One adapter per layer, so a session can read and write it.</p>
-  <aside class="notes">Appendix: what you need to try this. This is the toolkit that connects each layer to a session. For Lark, lark-cli reads and writes docs and wikis with my own user-delegated login and no scope elevation, the lark skills tell a session how to use it, and a Lark agent does Lark work in the background. For Jira, the Atlassian MCP connector reads and writes tickets in markdown, and tracking uses Jira's own epics, links and status. For the code, gh with gh-stack manages stacked pull requests, each PR gets its own git worktree, local SonarQube scripts run the quality gate before a push, and kubectl and gcloud reach staging. The load-test harness sits beside the code: k6 locally and in the cloud, with Grafana, Jaeger and Pyroscope to read the results. For the vault, the Obsidian CLI reads and writes notes, and a vault agent helps record decisions when they matter and recall them before acting. Memory is the agent's file-based memory: an index with one fact per file. The team skills pack is shared and versioned. It teaches a session the company systems: an architecture overview, logs, databases, metrics and code quality. The rule across all of them: auth is always my own, and never elevated.</aside>
+  <aside class="notes">Appendix: what you need to try this. This is the toolkit that connects each layer to a session. For the team docs, a CLI reads and writes docs and wikis with my own user-delegated login and no scope elevation, the docs skills tell a session how to use it, and a docs agent does docs work in the background. For Jira, the Atlassian MCP connector reads and writes tickets in markdown, and tracking uses Jira's own epics, links and status. For the code, gh with gh-stack manages stacked pull requests, each PR gets its own git worktree, local SonarQube scripts run the quality gate before a push, and kubectl and gcloud reach staging. The load-test harness sits beside the code: k6 locally and in the cloud, with Grafana, Jaeger and Pyroscope to read the results. For the vault, the Obsidian CLI reads and writes notes, and a vault agent helps record decisions when they matter and recall them before acting. Memory is the agent's file-based memory: an index with one fact per file. The team skills pack is shared and versioned. It teaches a session the company systems: an architecture overview, logs, databases, metrics and code quality. The rule across all of them: auth is always my own, and never elevated.</aside>
 </section>
 
 <div id="chrome"><span id="secLabel"></span><span id="counter"></span></div>
@@ -763,23 +763,23 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
 
   // The layer map.
   const NODES = {
-    lark: [800, 140, 'LARK', 'agreed · shared', '<path d="M0 0h18l8 8v28H0z"/><path d="M18 0v8h8M5 16h16M5 22h16M5 28h10"/>'],
+    docs: [800, 140, 'TEAM DOCS', 'agreed · shared', '<path d="M0 0h18l8 8v28H0z"/><path d="M18 0v8h8M5 16h16M5 22h16M5 28h10"/>'],
     code: [330, 470, 'CODE', 'built', '<path d="M9 8L0 18l9 10M21 8l9 10-9 10M18 4l-6 28"/>'],
     vault: [1270, 470, 'VAULT', 'why', '<rect x="0" y="2" width="28" height="9" rx="2"/><path d="M2 11v22h24V11M10 18h8"/>'],
     memory: [800, 790, 'MEMORY', 'how we work', '<circle cx="3" cy="6" r="2"/><circle cx="3" cy="17" r="2"/><circle cx="3" cy="28" r="2"/><path d="M10 6h18M10 17h18M10 28h12"/>'],
     sessions: [800, 470, 'SESSIONS', 'scratch', '<rect x="0" y="2" width="30" height="30" rx="4"/><path d="M6 12l5 5-5 5M14 23h9"/>']
   };
   const NW = 250, NH = 110;
-  const SHARED = { lark: 1, code: 1 };
+  const SHARED = { docs: 1, code: 1 };
   const ARROWS = [
-    ['a1', 'lark', 'sessions', 'M800 195 L800 415', 'a question', 814, 312, 'start'],
+    ['a1', 'docs', 'sessions', 'M800 195 L800 415', 'a question', 814, 312, 'start'],
     ['a2', 'sessions', 'code', 'M675 470 L455 470', 'investigate · fix', 565, 455, 'middle'],
     ['a3', 'sessions', 'vault', 'M925 450 C1010 418 1060 418 1145 450', 'record why', 1035, 412, 'middle'],
     ['a4', 'vault', 'sessions', 'M1145 492 C1060 524 1010 524 925 492', 'recall', 1035, 548, 'middle'],
-    ['a5', 'code', 'lark', 'M330 415 C330 230 470 140 675 140', 'update to match', 402, 196, 'end'],
+    ['a5', 'code', 'docs', 'M330 415 C330 230 470 140 675 140', 'update to match', 402, 196, 'end'],
     ['a6', 'memory', 'sessions', 'M800 735 L800 525', 'how we work', 814, 636, 'start'],
-    ['a0', 'person', 'lark', 'M604 40 C 660 40, 700 55, 730 83', 'drafts the base design', 556, 30, 'end'],
-    ['a7', 'lark', 'lark', 'M860 85 C 880 22, 965 30, 927 118', 'agent polishes', 958, 40, 'start', '5 6']
+    ['a0', 'person', 'docs', 'M604 40 C 660 40, 700 55, 730 83', 'drafts the base design', 556, 30, 'end'],
+    ['a7', 'docs', 'docs', 'M860 85 C 880 22, 965 30, 927 118', 'agent polishes', 958, 40, 'start', '5 6']
   ];
   const mapg = document.getElementById('mapg');
   const A = {}, N = {};
@@ -819,9 +819,9 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     title:    { c: [800, 465], s: .62, p: [1130, 500], lit: ALL },
     home:     { c: [800, 465], s: .6,  p: [480, 525],  lit: ALL, person: .5 },
     loop:     { c: [800, 465], s: .65, p: [496, 520],  lit: ALL, person: 1 },
-    lark:     { c: [800, 140], s: 2.1, p: [420, 520],  lit: ['lark'] },
-    larkcode: { c: [565, 305], s: .7, p: [352, 470], lit: ['code', 'lark'], mute: ['a5'], adim: 0, ndim: 0, rename: { lark: 'TEAM DOCS' } },
-    larkIn:   { c: [800, 140], s: 5.2, p: [800, 518],  lit: ['lark'], hide: ['lark'], adim: 0, nofocus: true },
+    docs:     { c: [800, 140], s: 2.1, p: [420, 520],  lit: ['docs'] },
+    docscode: { c: [565, 305], s: .7, p: [352, 470], lit: ['code', 'docs'], mute: ['a5'], adim: 0, ndim: 0, rename: { docs: 'TEAM DOCS' } },
+    docsIn:   { c: [800, 140], s: 5.2, p: [800, 518],  lit: ['docs'], hide: ['docs'], adim: 0, nofocus: true },
     vault:    { c: [1270, 470], s: 2,  p: [360, 480],  lit: ['vault'] },
     memsess:  { c: [800, 630], s: 1.25, p: [330, 520], lit: ['memory', 'sessions'], hi: ['a6'], scrim: 800, ndim: .08, adim: .06 },
     code:     { c: [330, 470], s: .85, p: [202, 560],  lit: ['code'], scrim: 330, adim: .07, ndim: .1 },
@@ -830,7 +830,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     links:    { c: [800, 465], s: .72, p: [560, 520], lit: ALL },
     sessL:    { c: [800, 470], s: .85, p: [202, 560], lit: ['sessions'], scrim: 330, adim: .04, ndim: 0 },
     sess:     { c: [800, 470], s: 1.6, p: [300, 470],  lit: ['sessions'], scrim: 560, adim: .06, ndim: .1 },
-    codelark: { c: [500, 280], s: 1.1, p: [430, 470], lit: ['code', 'lark'], hi: ['a5'], scrim: 930, adim: .1, ndim: .15 }
+    codedocs: { c: [500, 280], s: 1.1, p: [430, 470], lit: ['code', 'docs'], hi: ['a5'], scrim: 930, adim: .1, ndim: .15 }
   };
   const Z = { x: 0, y: 0, s: 1 };
   const renderZ = () => mapg.setAttribute('transform', `translate(${Z.x} ${Z.y}) scale(${Z.s})`);
@@ -957,7 +957,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       fin(t);
     },
     setup: el => {
-      const t = T(), groups = [[['lark'], [0, 1, 2]], [['code'], [3, 4, 5, 6, 7]], [['vault'], [8, 9]], [['memory'], [10]], [['sessions'], [11]]];
+      const t = T(), groups = [[['docs'], [0, 1, 2]], [['code'], [3, 4, 5, 6, 7]], [['vault'], [8, 9]], [['memory'], [10]], [['sessions'], [11]]];
       const su = [...el.querySelectorAll('.su')], ln = [...el.querySelectorAll('.sul')];
       const lineOf = [0, 0, 1, 2, 2, 2, 2, 3, 4, 4, 5, 6];
       groups.forEach(([[k], ids], g) => {
@@ -980,7 +980,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       fin(t);
       if (!reduce) own(gsap.to(el.querySelectorAll('.cyc'), { rotation: 360, transformOrigin: '50% 50%', duration: 4, repeat: -1, ease: 'none', delay: 3 }));
     },
-    whylark: el => {
+    whydocs: el => {
       const t = T(), ls = el.querySelectorAll('.wal'), cs = el.querySelectorAll('.wac');
       cs.forEach((c, i) => { drawSA(t, ls[i], i * .55, .5); t.fromTo(c, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: .4, ease: 'power2.out' }, i * .55 + .35); });
       t.fromTo(el.querySelector('.wast'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 2.8);
@@ -1001,7 +1001,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       items(t, el.querySelectorAll('.hkq'), 4.0, .6);
       fin(t);
     },
-    larkc: el => {
+    docsc: el => {
       const t = T(), q = s => el.querySelectorAll(s);
       fade(t, q('.lkNe'), .2, .4);
       fade(t, q('.lkCap'), .5, .4);
@@ -1069,7 +1069,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       t.fromTo(el.querySelectorAll('.bars i.d'), { opacity: 0 }, { opacity: 1, duration: .4, stagger: .2 }, 1.0);
       t.fromTo(el.querySelectorAll('.ch'), IN, { ...OUT, stagger: .25 }, 1.9);
       el.querySelectorAll('.onl').forEach((p, i) => drawSA(t, p, 2.1 + i * .25, .6));
-      ring(t, 'lark', 2.6);
+      ring(t, 'docs', 2.6);
       fin(t);
     },
     shape: el => {
@@ -1226,7 +1226,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
     takeaways: el => {
       const t = T(), rows = [...el.querySelectorAll('.tk')];
       items(t, el.querySelectorAll('.a'), 0, .8);
-      ring(t, 'lark', .05);
+      ring(t, 'docs', .05);
       ring(t, 'vault', .85); ring(t, 'code', .85);
       ring(t, 'code', 1.65);
       void rows;
