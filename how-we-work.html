@@ -356,7 +356,7 @@ rules: <span class="s">constitution &gt; security &gt; conventions</span> <span 
   <h2 class="h">Links, not names</h2>
   <svg class="ov x" width="1600" height="900">
     <path class="sa lkl" d="M282 252 C 400 196, 560 196, 668 244" data-c="#5ab4e8" data-w="2"/>
-    <path class="sa lkl" d="M822 250 C 1030 290, 1050 520, 1020 588" data-c="#5ab4e8" data-w="2"/>
+    <path class="sa lkl" d="M783 250 C 1000 290, 1050 520, 1020 588" data-c="#5ab4e8" data-w="2"/>
     <path class="sa lkl" d="M1000 624 C 880 720, 400 720, 200 626" data-c="#5ab4e8" data-w="2"/>
     <path class="sa lkl" d="M150 590 C 96 500, 96 360, 170 272" data-c="#5ab4e8" data-w="2"/>
   </svg>
@@ -891,9 +891,10 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
   const ring = (t, k, at) => { t.fromTo(N[k].ring, { opacity: 0 }, { opacity: 1, duration: .25 }, at).to(N[k].ring, { opacity: 0, duration: .7 }, at + 1.1); };
   const pulse = (t, c, id, at, dur = .8) => {
     const p = A[id].p, len = p.getTotalLength(), o = { v: 0 };
-    t.set(c, { opacity: 1 }, at);
+    // Short fades at both ends, so a dot handed from one arrow to the next never visibly jumps.
+    t.fromTo(c, { opacity: 0 }, { opacity: 1, duration: .08, immediateRender: false }, at);
     t.to(o, { v: 1, duration: dur, ease: 'power1.inOut', onUpdate: () => { const q = p.getPointAtLength(len * o.v); c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); } }, at);
-    t.set(c, { opacity: 0 }, at + dur);
+    t.to(c, { opacity: 0, duration: .08 }, at + dur - .08);
   };
   const generic = el => { const t = T(); items(t, el.querySelectorAll('.a')); fin(t); };
 
@@ -951,7 +952,7 @@ GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash &lt;base&gt;</pre>
       fin(t);
       if (!reduce) {
         const r = own(gsap.timeline({ repeat: -1, repeatDelay: 1.6, delay: .9 + 3.0 + steps.length * .4 + 1 }));
-        seq.forEach(([id, at]) => pulse(r, pulses[id === 'a3' ? 1 : 0], id, at, .8));
+        seq.forEach(([id, at]) => pulse(r, pulses[id === 'a3' ? 1 : 0], id, at, .55));
       }
     },
     ondemand: el => {
